@@ -81,12 +81,21 @@
             }
         }
     },
+    "猎影合围_协助_点击无偿协助": {
+        "recognition": {
+            "param": {
+                "expected": [
+                    "Free Support"
+                ]
+            }
+        }
+    },
     "__猎影合围_协助_没有可以讨伐的目标": {
         "recognition": {
             "param": {
                 "expected": [
-                    "(?i)can hunt" // 猜的
-
+                    "No targets available to hunt",
+                    "No players available to support"
                 ]
             }
         }

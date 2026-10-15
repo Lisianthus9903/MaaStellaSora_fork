@@ -122,11 +122,24 @@ class EnoughHuntLicenseRecognition(CustomRecognition):
 @AgentServer.custom_recognition("lack_of_hunt_license_recognition")
 class LackOfHuntLicenseRecognition(CustomRecognition):
     def analyze(self, context: Context, argv: CustomRecognition.AnalyzeArg) -> CustomRecognition.AnalyzeResult:
-        """检查围猎许可证是否小于保留数量。"""
+        """检查围猎许可证是否小于保留数量，以及无偿协助是否已完成。"""
         keep_count = _get_keep_count(context, "hunt_license_keep_count")
         count = _get_resource_count(context, argv.image)
         logger.debug(f"结束协助模块前检查：围猎许可证数量{count}，保留数量{keep_count}")
         if count is None or keep_count is None or (count > keep_count and count > 0):
             return CustomRecognition.AnalyzeResult(box=None, detail={})
+        if not self._is_free_support_completed(context):
+            return CustomRecognition.AnalyzeResult(box=None, detail={})
 
         return CustomRecognition.AnalyzeResult(box=(1, 1, 1, 1), detail={})
+
+    @staticmethod
+    def _is_free_support_completed(context: Context) -> bool:
+        """检查无偿协助是否已完成"""
+        node_name = "猎影合围_协助_点击无偿协助"
+        node_data = context.get_node_data(node_name) or {}
+        enabled = node_data.get("enabled", False)
+        max_hit = node_data.get("max_hit", 0)
+        hit = context.get_hit_count(node_name)
+        logger.debug(f"结束协助模块前检查：当前无偿协助次数{hit}，目标次数{max_hit}")
+        return not enabled or hit >= max_hit

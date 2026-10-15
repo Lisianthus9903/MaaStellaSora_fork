@@ -24,7 +24,7 @@
                         }
                     },
                     "option": [
-                        "猎影合围_协助讨伐_保留数量"
+                        "猎影合围_协助讨伐_开启无偿协助"
                     ]
                 },
                 {
@@ -53,6 +53,54 @@
                     "attach": {
                         "hunt_license_keep_count": "{猎影合围_协助讨伐_保留围猎许可证数量}"
                     }
+                }
+            }
+        },
+        "猎影合围_协助讨伐_开启无偿协助": {
+            "type": "switch",
+            "label": "开启无偿协助",
+            "description": "达到一定等级后可以无偿协助他人。若还有围猎许可证会先消耗完，之后在许可证为0的状态下进行指定次数的无偿协助",
+            "default_case": "No",
+            "cases": [
+                {
+                    "name": "No",
+                    "pipeline_override": {
+                        "猎影合围_协助_点击无偿协助": {
+                            "enabled": false
+                        }
+                    },
+                    "option": [
+                        "猎影合围_协助讨伐_保留数量"
+                    ]
+                },
+                {
+                    "name": "Yes",
+                    "pipeline_override": {
+                        "猎影合围_协助_点击无偿协助": {
+                            "enabled": true
+                        }
+                    },
+                    "option": [
+                        "猎影合围_协助讨伐_无偿协助次数"
+                    ]
+                },
+            ]
+        },
+        "猎影合围_协助讨伐_无偿协助次数": {
+            "type": "input",
+            "inputs": [
+                {
+                    "name": "无偿协助次数",
+                    "label": "无偿协助次数",
+                    "description": "如果连续战斗过久，可能会被官方盯上，请谨慎设置次数",
+                    "verify": "^[1-9]\\d*$",
+                    "default": "5",
+                    "pipeline_type": "int"
+                }
+            ],
+            "pipeline_override": {
+                "猎影合围_协助_点击无偿协助": {
+                    "max_hit":  "{无偿协助次数}"
                 }
             }
         },
