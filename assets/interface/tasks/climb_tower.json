@@ -25,12 +25,12 @@
             "default_case": "主页",
             "cases": [
                 {
-                    "name": "开始位置_主页",
+                    "name": "主页",
                     "label": "主页",
                     "description": "从主页开始，不需要调整编队时选择"
                 },
                 {
-                    "name": "开始位置_进入星塔后",
+                    "name": "进入星塔后",
                     "label": "进入星塔后",
                     "description": "进入星塔后开始，需要调整编队时或爬塔中断时选择",
                     "pipeline_override": {
