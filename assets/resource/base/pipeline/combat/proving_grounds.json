@@ -185,19 +185,24 @@
             "type": "And",
             "param": {
                 "all_of": [
-                    "通用_点击空白处继续"
+                    "通用战斗_战斗结束"
                 ]
             }
         },
-        "pre_delay": 0,
-        "post_delay": 0,
+        "action": {
+            "type": "Click",
+            "target": [
+                540,
+                600,
+                200,
+                100
+            ]
+        },
+        "post_delay": 500,
         "next": [
             "真格挑战_主界面",
-            "[JumpBack]通用_点击空白处继续"
-        ],
-        "focus": {
-            "Node.Action.Succeeded": "单次首领挑战完成"
-        }
+            "真格挑战_挑战完成"
+        ]
     },
     "真格挑战_没有默认纪录": {
         "recognition": {

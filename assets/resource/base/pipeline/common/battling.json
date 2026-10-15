@@ -17,7 +17,10 @@
         "next": [
             "通用战斗_自动战斗是否已打开",
             "[JumpBack]通用战斗_打开自动战斗"
-        ]
+        ],
+        "focus": {
+            "Node.Action.Succeeded": "进入战斗"
+        }
     },
     "通用战斗_自动战斗是否已打开": {
         "recognition": {
@@ -73,14 +76,21 @@
     },
     "通用战斗_战斗结束": {
         "recognition": {
-            "type": "And",
+            "type": "TemplateMatch",
             "param": {
-                "all_of": [
-                    "通用_点击空白处继续"
+                "template": [
+                    "battling/battle_result.png"
+                ],
+                "roi": [
+                    0,
+                    600,
+                    120,
+                    120
                 ]
             }
         },
-        "pre_delay": 0,
-        "post_delay": 0
+        "focus": {
+            "Node.Action.Succeeded": "战斗结束"
+        }
     }
 }
