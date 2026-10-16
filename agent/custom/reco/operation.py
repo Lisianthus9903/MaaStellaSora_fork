@@ -141,5 +141,5 @@ class LackOfHuntLicenseRecognition(CustomRecognition):
         enabled = node_data.get("enabled", False)
         max_hit = node_data.get("max_hit", 0)
         hit = context.get_hit_count(node_name)
-        logger.debug(f"结束协助模块前检查：当前无偿协助次数{hit}，目标次数{max_hit}")
+        logger.debug(f"结束协助模块前检查：当前无偿协助开关为{enabled}，当前无偿协助次数{hit}，目标次数{max_hit}")
         return not enabled or hit >= max_hit
