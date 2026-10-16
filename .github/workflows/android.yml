@@ -147,7 +147,7 @@ jobs:
       - name: Generate MaaFwApp profile
         env:
           PROJECT_ROOT: ${{ github.workspace }}
-          BUILD_RELEASE: ${{ github.event_name == 'workflow_call' && inputs.release }}
+          BUILD_RELEASE: ${{ inputs.release }}
         run: |
           APP_ID=maastellasora
           APP_LABEL=MaaStellaSora
@@ -219,7 +219,7 @@ jobs:
           cat local.properties
 
       - name: Prepare release signing
-        if: ${{ github.event_name == 'workflow_call' && inputs.release }}
+        if: ${{ inputs.release }}
         env:
           KEYSTORE_BASE64: ${{ secrets.ANDROID_SIGNING_KEYSTORE_BASE64 }}
           KEYSTORE_PASSWORD: ${{ secrets.ANDROID_SIGNING_KEYSTORE_PASSWORD }}
@@ -242,7 +242,7 @@ jobs:
       - name: Build APK
         working-directory: vendor/MaaFwApp
         env:
-          BUILD_RELEASE: ${{ github.event_name == 'workflow_call' && inputs.release }}
+          BUILD_RELEASE: ${{ inputs.release }}
           KEYSTORE_PASSWORD: ${{ secrets.ANDROID_SIGNING_KEYSTORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.ANDROID_SIGNING_KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.ANDROID_SIGNING_KEY_PASSWORD }}
@@ -259,7 +259,7 @@ jobs:
         env:
           PROJECT_ROOT: ${{ github.workspace }}
           ANDROID_APP_VERSION: ${{ steps.version.outputs.version }}
-          BUILD_RELEASE: ${{ github.event_name == 'workflow_call' && inputs.release }}
+          BUILD_RELEASE: ${{ inputs.release }}
         run: |
           BUILD_TYPE=debug
           if [[ "$BUILD_RELEASE" == "true" ]]; then
