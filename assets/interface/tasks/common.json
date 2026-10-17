@@ -1,0 +1,29 @@
+{
+    "option": {
+        "自定义快速作战次数": {
+            "type": "input",
+            "label": "自定义快速作战次数",
+            "inputs": [
+                {
+                    "name": "次数",
+                    "label": "次数",
+                    "description": "打几次就填几",
+                    "default": "1",
+                    "pipeline_type": "int",
+                    "verify": "^[1-9]\\d*$"
+                }
+            ],
+            "pipeline_override": {
+                "通用_换算快速作战次数": {
+                    "action": {
+                        "type": "Custom",
+                        "param": {
+                            "custom_action": "utool_calc_repeat",
+                            "custom_action_param": "{次数}"
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
