@@ -144,6 +144,14 @@ jobs:
           print(f"Prepared Android PI version {version}")
           PY
 
+      - name: Prepare OCR model
+        env:
+          PROJECT_ROOT: ${{ github.workspace }}
+        run: |
+          python3 "$PROJECT_ROOT/tools/ci/configure.py" \
+            --assets-dir "$PROJECT_ROOT/assets" \
+            --ocr-dir "$PROJECT_ROOT/android-build/pi/resource/base/model/ocr"
+
       - name: Generate MaaFwApp profile
         env:
           PROJECT_ROOT: ${{ github.workspace }}
@@ -353,6 +361,16 @@ jobs:
                           raise SystemExit(f"PI archive has no files under resource path: {path}")
               if "agent/main.py" not in pi_names:
                   raise SystemExit("PI archive is missing agent/main.py")
+              required_ocr_files = {
+                  "resource/base/model/ocr/det.onnx",
+                  "resource/base/model/ocr/rec.onnx",
+                  "resource/base/model/ocr/keys.txt",
+              }
+              missing_ocr_files = required_ocr_files - pi_names
+              if missing_ocr_files:
+                  raise SystemExit(
+                      f"PI archive is missing OCR model files: {sorted(missing_ocr_files)}"
+                  )
 
           print(
               f"Verified APK {package.group(1)} {package.group(3)} "

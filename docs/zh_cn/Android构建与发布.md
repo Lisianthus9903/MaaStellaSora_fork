@@ -67,14 +67,15 @@ debug 与 release 使用不同的 Android applicationId 和桌面显示名：
 1. 检出本仓库和 MaaFwApp，安装 Python 3.12、JDK 17 与 Android SDK。
 2. 使用 MaaFwApp 的 `build_agent_bundle.py` 为 `arm64-v8a` 构建 Python Agent bundle；依赖来自 `agent/requirements.txt` 和 Chaquopy Android wheel 索引。
 3. 建立独立暂存 PI `android-build/pi/`，复制 `assets/` 与 `agent/`，确保这里的根级存在 `interface.json`。只在暂存副本中更新版本与 Android welcome 字段。
-4. 构建前检查 `interface.json` 的 `import`、`resource.path` 和 `controller.attach_resource_path` 都能从 PI 根解析。
-5. 生成 MaaFwApp `profile.yaml`：PI 根作为 `assets`，显式列出 include；`app.icon` 指向项目 logo，Agent 运行时指向刚生成的 bundle。
-6. 下载并部署 ARM64 MaaFramework runtime，写入 MaaFwApp 所需 `local.properties`，构建所选 APK variant。
-7. 检查 APK 包名、版本、签名、原生库和 `assets/pi.zip` 内容；验证通过后按统一名称上传 artifact。
+4. 调用 `tools/ci/configure.py`，在暂存 PI 中准备 OCR 模型：保留并校验已存在的完整模型；缺失时从 `assets/MaaCommonAssets/OCR/ppocr_v6/small` 导入默认模型。
+5. 构建前检查 `interface.json` 的 `import`、`resource.path` 和 `controller.attach_resource_path` 都能从 PI 根解析。
+6. 生成 MaaFwApp `profile.yaml`：PI 根作为 `assets`，显式列出 include；`app.icon` 指向项目 logo，Agent 运行时指向刚生成的 bundle。
+7. 下载并部署 ARM64 MaaFramework runtime，写入 MaaFwApp 所需 `local.properties`，构建所选 APK variant。
+8. 检查 APK 包名、版本、签名、原生库和 `assets/pi.zip` 内容（包括 OCR 检测模型、识别模型与字符表）；验证通过后按统一名称上传 artifact。
 
 **暂存目录是有意设计，不要直接改写源资源。** MaaFwApp profile 的 `assets` 必须指向包含根级 `interface.json` 的目录；PI 的导入和资源路径相对于该目录解析。`include` 一旦显式提供，就取代 MaaFwApp 的默认 include 列表，所以新增 PI 文件时要确认它已被纳入。修改资源或 Agent 入口时，应同步核对 PI 源定义、暂存检查、profile include 和最终 APK 检查。
 
-Android 的 `welcome` 和版本值均只更改 PI 暂存副本，避免为了 Android UI 修改桌面端配置。图标来自 `assets/logo.png`。若未来某项配置需要跨平台共用，再判断是否应移入源 `interface.json`，不要仅为了 Android 构建方便改变桌面行为。
+Android 的 `welcome` 和版本值均只更改 PI 暂存副本，避免为了 Android UI 修改桌面端配置。OCR 模型使用与桌面发行包相同的 `tools/ci/configure.py` 准备逻辑，但目标目录是 PI 暂存副本，避免改写源码资源；因此四个平台都能在打包资源中获得必需模型。图标来自 `assets/logo.png`。若未来某项配置需要跨平台共用，再判断是否应移入源 `interface.json`，不要仅为了 Android 构建方便改变桌面行为。
 
 ## 版本号与资源重解包
 
@@ -132,7 +133,7 @@ Base64 secret 应由正式发布使用的 keystore 编码得到。密钥不得�
 ## 修改时的维护清单
 
 - 改输入参数：同步核对 `android.yml` 的手动触发与 `workflow_call` 接口，以及 `install.yml` 的调用。
-- 改 PI 文件或路径：保持暂存 PI 根级 `interface.json` 正确；同步核对 imports、resources、include 和 APK archive 检查。
+- 改 PI 文件或路径：保持暂存 PI 根级 `interface.json` 正确；同步核对 imports、resources、include 和 APK archive 检查，并确保三个 OCR 模型文件在最终 archive 中。
 - 改版本策略：确认正式 tag、非 release CI 版本、PI version、APK `versionName`、artifact 名和 release 检查一致。
 - 改 ABI：同步 Agent bundle、MaaFramework runtime、MaaFwApp profile、APK ABI 检查和资产命名。
 - 改签名：确保 debug/release 分支仍明确分离；不得在缺少 release 密钥时成功产出未签名正式包。

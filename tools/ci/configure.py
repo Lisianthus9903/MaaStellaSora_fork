@@ -1,3 +1,4 @@
+import argparse
 from pathlib import Path
 
 import shutil
@@ -26,6 +27,10 @@ def configure_ocr_model(
 
 
 if __name__ == "__main__":
-    configure_ocr_model()
+    parser = argparse.ArgumentParser(description="Prepare the project OCR model.")
+    parser.add_argument("--assets-dir", type=Path, default=ASSETS_DIR)
+    parser.add_argument("--ocr-dir", type=Path)
+    args = parser.parse_args()
+    configure_ocr_model(args.assets_dir, args.ocr_dir)
 
     print("OCR model configured.")
