@@ -32,10 +32,16 @@
     },
     "猎影合围_出发主界面": {
         "recognition": {
-            "type": "And",
+            "type": "TemplateMatch",
             "param": {
-                "all_of": [
-                    "猎影合围_点击入口图标"
+                "template": [
+                    "出发_主界面.png"
+                ],
+                "roi": [
+                    620,
+                    0,
+                    660,
+                    720
                 ]
             }
         },
@@ -52,10 +58,10 @@
                     "operation/entry.png"
                 ],
                 "roi": [
+                    620,
                     0,
-                    600,
-                    230,
-                    120
+                    660,
+                    720
                 ]
             }
         },

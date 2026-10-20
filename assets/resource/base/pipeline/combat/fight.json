@@ -48,11 +48,28 @@
             "type": "Click"
         },
         "next": [
+            "战斗_出发主界面"
+        ]
+    },
+    "战斗_出发主界面": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "出发_主界面.png"
+                ],
+                "roi": [
+                    620,
+                    0,
+                    660,
+                    720
+                ]
+            }
+        },
+        "post_wait_freezes": 100,
+        "next": [
             "战斗_悬赏试炼"
-        ],
-        "focus": {
-            "Node.Action.Succeeded": "前往出发"
-        }
+        ]
     },
     "战斗_快速战斗": {
         "recognition": {
@@ -88,24 +105,20 @@
                     "悬赏试炼"
                 ],
                 "roi": [
-                    920,
-                    160,
-                    230,
-                    185
+                    620,
+                    0,
+                    660,
+                    720
                 ]
             }
         },
-        "pre_wait_freezes": 100,
         "action": {
             "type": "Click"
         },
         "post_wait_freezes": 100,
         "next": [
             "战斗_选择试炼"
-        ],
-        "focus": {
-            "Node.Action.Succeeded": "进入悬赏试炼"
-        }
+        ]
     },
     "战斗_试炼出发": {
         "recognition": {
@@ -123,10 +136,7 @@
         "next": [
             "战斗_选择难度",
             "[JumpBack]战斗_选择试炼子菜单"
-        ],
-        "focus": {
-            "Node.Action.Succeeded": "进入试炼出发"
-        }
+        ]
     },
     "战斗_选择试炼": {
         "recognition": {
@@ -151,10 +161,7 @@
         },
         "next": [
             "战斗_试炼出发"
-        ],
-        "focus": {
-            "Node.Action.Succeeded": "进入对应试炼"
-        }
+        ]
     },
     "战斗_选择试炼子菜单": {
         "enabled": false,
@@ -169,10 +176,7 @@
         "action": {
             "type": "Click"
         },
-        "post_wait_freezes": 500,
-        "focus": {
-            "Node.Action.Succeeded": "进入试炼子菜单"
-        }
+        "post_wait_freezes": 500
     },
     "战斗_选择难度": {
         "recognition": {
@@ -188,9 +192,6 @@
         },
         "next": [
             "战斗_快速战斗"
-        ],
-        "focus": {
-            "Node.Action.Succeeded": "选择指定难度"
-        }
+        ]
     }
 }

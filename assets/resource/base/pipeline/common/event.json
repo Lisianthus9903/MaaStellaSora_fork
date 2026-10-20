@@ -52,7 +52,15 @@
             }
         },
         "action": {
-            "type": "Click"
+            "type": "Click",
+            "param": {
+                "target_offset": [
+                    0,
+                    -25,
+                    0,
+                    0
+                ]
+            }
         },
         "post_wait_freezes": {
             "time": 100,
