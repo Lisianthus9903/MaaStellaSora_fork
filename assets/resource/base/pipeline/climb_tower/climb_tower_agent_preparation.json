@@ -19,16 +19,10 @@
     },
     "星塔_出发_agent": {
         "recognition": {
-            "type": "OCR",
+            "type": "And",
             "param": {
-                "expected": [
-                    "出发"
-                ],
-                "roi": [
-                    1112,
-                    652,
-                    83,
-                    39
+                "all_of": [
+                    "通用_主页_出发"
                 ]
             }
         },
@@ -36,13 +30,27 @@
             "type": "Click"
         },
         "next": [
-            "星塔_星塔探索按钮_agent"
+            "星塔_出发_主界面"
         ]
     },
     "星塔_跳过进入星塔流程_agent": {
         "enabled": false,
         "next": [
             "星塔_开始爬塔_agent"
+        ]
+    },
+    "星塔_出发_主界面": {
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    "通用_出发_主界面"
+                ]
+            }
+        },
+        "post_wait_freezes": 100,
+        "next": [
+            "星塔_星塔探索按钮_agent"
         ]
     },
     "星塔_星塔探索按钮_agent": {

@@ -250,22 +250,38 @@
     },
     "通用_主页_出发": {
         "recognition": {
-            "type": "OCR",
+            "type": "TemplateMatch",
             "param": {
-                "expected": [
-                    "出发"
+                "template": [
+                    "出发.png"
                 ],
                 "roi": [
-                    1122,
-                    656,
-                    64,
-                    32
-                ],
-                "only_rec": true
+                    960,
+                    490,
+                    320,
+                    230
+                ]
             }
         },
         "action": {
             "type": "Click"
         }
+    },
+    "通用_出发_主界面": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "出发_主界面.png"
+                ],
+                "roi": [
+                    620,
+                    0,
+                    660,
+                    720
+                ]
+            }
+        },
+        "post_wait_freezes": 100
     }
 }

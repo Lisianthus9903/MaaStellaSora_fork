@@ -18,16 +18,22 @@
             }
         },
         "action": {
-            "type": "Click",
+            "type": "Click"
+        },
+        "next": [
+            "真格挑战_出发_主界面"
+        ]
+    },
+    "真格挑战_出发_主界面": {
+        "recognition": {
+            "type": "And",
             "param": {
-                "target_offset": [
-                    0,
-                    -20,
-                    0,
-                    0
+                "all_of": [
+                    "通用_出发_主界面"
                 ]
             }
         },
+        "post_wait_freezes": 100,
         "next": [
             "真格挑战_入口图标"
         ]

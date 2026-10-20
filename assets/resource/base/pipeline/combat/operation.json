@@ -10,16 +10,10 @@
     },
     "猎影合围_出发": {
         "recognition": {
-            "type": "OCR",
+            "type": "And",
             "param": {
-                "expected": [
-                    "出发"
-                ],
-                "roi": [
-                    1112,
-                    652,
-                    83,
-                    39
+                "all_of": [
+                    "通用_主页_出发"
                 ]
             }
         },
@@ -32,16 +26,10 @@
     },
     "猎影合围_出发主界面": {
         "recognition": {
-            "type": "TemplateMatch",
+            "type": "And",
             "param": {
-                "template": [
-                    "出发_主界面.png"
-                ],
-                "roi": [
-                    620,
-                    0,
-                    660,
-                    720
+                "all_of": [
+                    "通用_出发_主界面"
                 ]
             }
         },
