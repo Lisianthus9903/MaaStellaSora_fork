@@ -257,5 +257,7 @@
     "interface.task.领取每日奖励.description": "自动领取采购中的每日奖励",
     "interface.task.领取每日奖励.label": "领取每日奖励",
     "interface.task.领取邮箱奖励.description": "自动打开邮箱页面，并且领取邮箱奖励",
-    "interface.task.领取邮箱奖励.label": "领取邮箱奖励"
+    "interface.task.领取邮箱奖励.label": "领取邮箱奖励",
+    "interface.task.魔王之塔.description": "自动完成魔王之塔日常，包括轻抚及每日馈赠",
+    "interface.task.魔王之塔.label": "魔王之塔"
 }

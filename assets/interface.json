@@ -89,6 +89,7 @@
         "interface/tasks/common.json",
         "interface/tasks/login.json",
         "interface/tasks/shop.json",
+        "interface/tasks/tyrants_tower.json",
         "interface/tasks/talk.json",
         "interface/tasks/invite.json",
         "interface/tasks/invite_select_cn.json",

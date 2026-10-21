@@ -1,0 +1,186 @@
+{
+    "魔王之塔_入口": {
+        "pre_delay": 0,
+        "post_delay": 0,
+        "next": [
+            "魔王之塔_点击魔王之塔",
+            "魔王之塔_主界面",
+            "[JumpBack]通用_返回主页"
+        ]
+    },
+    "魔王之塔_点击魔王之塔": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "tyrants_tower/entry.png"
+                ],
+                "roi": [
+                    850,
+                    490,
+                    430,
+                    230
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "next": [
+            "魔王之塔_主界面"
+        ]
+    },
+    "魔王之塔_主界面": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "tyrants_tower/mode_change.png"
+                ],
+                "roi": [
+                    1130,
+                    570,
+                    150,
+                    150
+                ]
+            }
+        },
+        "post_wait_freezes": 100,
+        "next": [
+            "[JumpBack]通用_点击空白处继续",
+            "[JumpBack]魔王之塔_点击默契提升",
+            "[JumpBack]魔王之塔_领取馈赠",
+            "[JumpBack]魔王之塔_轻抚",
+            "魔王之塔_完成"
+        ]
+    },
+    "魔王之塔_领取馈赠": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "tyrants_tower/claim_gifts.png"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "next": [
+            "魔王之塔_领取馈赠成功"
+        ],
+        "focus": {
+            "Node.Action.Succeeded": "当前可领取每日馈赠，点击领取馈赠"
+        }
+    },
+    "魔王之塔_领取馈赠成功": {
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    "通用_点击空白处继续"
+                ]
+            }
+        },
+        "post_wait_freezes": 100
+    },
+    "__魔王之塔_识别轻抚位置": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "tyrants_tower/pat.png"
+                ],
+                "roi": [
+                    1130,
+                    300,
+                    150,
+                    270
+                ],
+                "green_mask": true
+            }
+        },
+        "post_wait_freezes": 100
+    },
+    "__魔王之塔_判断轻抚状态": {
+        "recognition": {
+            "type": "ColorMatch",
+            "param": {
+                "roi": "__魔王之塔_识别轻抚位置",
+                "lower": [
+                    250,
+                    250,
+                    250
+                ],
+                "upper": [
+                    255,
+                    255,
+                    255
+                ],
+                "count": 100,
+                "connected": true
+            }
+        },
+        "post_wait_freezes": 100
+    },
+    "魔王之塔_轻抚": {
+        "max_hit": 1,
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    "__魔王之塔_识别轻抚位置",
+                    "__魔王之塔_判断轻抚状态"
+                ],
+                "box_index": 1
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "next": [
+            "魔王之塔_默契提升"
+        ],
+        "focus": {
+            "Node.Action.Succeeded": "当前可轻抚，点击轻抚"
+        }
+    },
+    "魔王之塔_默契提升": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "expected": [
+                    "默契提升"
+                ],
+                "roi": [
+                    420,
+                    160,
+                    430,
+                    120
+                ]
+            }
+        },
+        "post_wait_freezes": 100
+    },
+    "魔王之塔_点击默契提升": {
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    "魔王之塔_默契提升"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_wait_freezes": 100
+    },
+    "魔王之塔_完成": {
+        "pre_delay": 0,
+        "post_delay": 0,
+        "focus": {
+            "Node.Action.Succeeded": "魔王之塔日常完成"
+        }
+    }
+}
