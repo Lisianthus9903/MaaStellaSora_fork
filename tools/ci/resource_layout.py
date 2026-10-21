@@ -8,6 +8,7 @@ ALLOWED_STAGING_ENTRIES = ("deps", "python")
 PIPELINE_PATHS = {
     "common/base.json": "base.json",
     "daily/login.json": "login.json",
+    "daily/tyrants_tower.json": "tyrants_tower.json",
     "daily/friend.json": "friend.json",
     "daily/grant.json": "grant.json",
     "daily/mail.json": "mail.json",
