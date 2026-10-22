@@ -19,10 +19,12 @@ QQ交流群：**1063132902**  密码：**星塔旅人**
 - [x] 领取&发送好友干劲
 - [x] 领取委托并重新派遣
 - [x] 领取任务
+- [x] 领取基金奖励
 - [x] 自动爬塔
 - [x] 自动进行指定关卡
 - [x] 真格挑战
 - [x] 猎影合围
+- [x] 魔王之塔
 
 ## 安装与使用
 
@@ -39,7 +41,8 @@ QQ交流群：**1063132902**  密码：**星塔旅人**
 1. 前往 [GitHub Releases](https://github.com/MaaStellaSora/MaaStellaSora/releases) 下载 `MaaStellaSora-android-arm64-v8a-vX.Y.Z.apk`。
 2. 安卓端构建与发行使用 **MaaFwApp**，暂时只支持通过GitHub更新。
 3. 下载后，直接打开安装，即可使用。
-4. 使用时，需要先根据提示，使用内置的**Shizuku**权限管理工具获取权限，然后授权MaaStellaSora才能正常使用。
+4. 使用前，需要先根据提示，使用内置的**Shizuku**权限管理工具获取权限，然后授权MaaStellaSora才能正常使用。
+5. 注意：任何调整手机屏幕颜色的功能（包括但不限于护眼模式、省电模式、特殊色彩模式等）都会影响到识别精度，从而出现问题，请在使用时关闭这些功能。
 
 
 ## 参与开发或贡献
@@ -63,5 +66,5 @@ QQ交流群：**1063132902**  密码：**星塔旅人**
 - **[MaaFramework](https://github.com/MaaXYZ/MaaFramework)** 基于图像识别的自动化黑盒测试框架
 - **[MFAAvalonia](https://github.com/MaaXYZ/MFAAvalonia)** 基于 Avalonia 的通用 GUI，由 MaaFramework 强力驱动
 - **[MXU](https://github.com/MistEO/MXU)** 基于 Web 技术的 MaaFramework 通用 GUI
-- **[MaaFwApp](https://github.com/MaaXYZ/MaaFwApp)** 基于 Android 的 MaaFramework 通用 GUI
+- **[MaaFwApp](https://github.com/Aliothmoon/MaaFwApp)** 基于 Android 的 MaaFramework 通用 GUI
 - **[MaaPipelineEditor](https://github.com/kqcoxn/MaaPipelineEditor)** 可视化阅读与构建 Pipeline，功能完备，极致轻量跨平台，提供渐进式本地功能扩展，无缝兼容新旧项目
