@@ -337,7 +337,6 @@
         "邀约_回忆收集模式": {
             "type": "switch",
             "label": "$interface.task.option.邀约_回忆收集模式.label",
-            "resource": ["官服"],
             "description": "$interface.task.option.邀约_回忆收集模式.description",
             "default_case": "No",
             "cases": [
@@ -410,6 +409,7 @@
                 {
                     "name": "人数",
                     "label": "$interface.task.option.邀约_自动查找_最多查找人数.inputs.人数.label",
+                    "description": "$interface.task.option.邀约_自动查找_最多查找人数.inputs.人数.description",
                     "pipeline_type": "int",
                     "verify": "^[1-9]\\d*$",
                     "default": "5"

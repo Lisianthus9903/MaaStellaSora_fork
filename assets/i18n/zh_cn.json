@@ -189,6 +189,7 @@
     "interface.task.option.邀约_自动收集_送礼类型.description": "自动找到的角色统一使用该送礼类型。",
     "interface.task.option.邀约_自动收集_送礼类型.label": "自动收集送礼类型",
     "interface.task.option.邀约_自动查找_最多查找人数.inputs.人数.label": "最多查找人数",
+    "interface.task.option.邀约_自动查找_最多查找人数.inputs.人数.description": "最多填5，结果不足5个时会在下面的邀约旅人中补充",
     "interface.task.option.邀约_自动查找未收集.description": "开启后自动遍历左侧角色列表，找出有未收集回忆的角色并优先邀约。",
     "interface.task.option.邀约_自动查找未收集.label": "自动查找未收集回忆",
     "interface.task.option.邀约旅人.inputs.1号.description": "请输入旅人名字，如希娅。如没有邀约对象请输入字母x或留空。",
