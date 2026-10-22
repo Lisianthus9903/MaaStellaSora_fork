@@ -181,7 +181,7 @@
     "interface.task.option.选择悬赏试炼难度.inputs.难度.description": "请输入难度",
     "interface.task.option.选择悬赏试炼难度.inputs.难度.label": "难度",
     "interface.task.option.选择悬赏试炼难度.inputs.难度.pattern_msg": "请输入难度",
-    "interface.task.option.邀约_回忆收集模式.description": "开启后不再快进对话，改为逐句推进并选择特殊选项以收集角色特殊回忆。",
+    "interface.task.option.邀约_回忆收集模式.description": "开启后逐句推进对话，优先选择右上角带爱心卡片标记的选项以收集角色特殊回忆。",
     "interface.task.option.邀约_回忆收集模式.label": "回忆收集模式",
     "interface.task.option.邀约_自动收集_送礼类型.cases.不送.label": "不送",
     "interface.task.option.邀约_自动收集_送礼类型.cases.所有.label": "所有",

@@ -345,10 +345,17 @@
                     "name": "No",
                     "label": "No",
                     "pipeline_override": {
-                        "邀约_总循环": {
-                            "attach": {
-                                "memory_mode": false
-                            }
+                        "邀约_选择默认地点": {
+                            "next": [
+                                "邀约_跳过",
+                                "邀约_选择默认地点"
+                            ]
+                        },
+                        "邀约_选择回忆地点": {
+                            "next": [
+                                "邀约_跳过",
+                                "邀约_选择回忆地点"
+                            ]
                         }
                     }
                 },
@@ -356,11 +363,6 @@
                     "name": "Yes",
                     "label": "Yes",
                     "pipeline_override": {
-                        "邀约_总循环": {
-                            "attach": {
-                                "memory_mode": true
-                            }
-                        },
                         "邀约_选择默认地点": {
                             "next": [
                                 "邀约_回忆收集_循环"

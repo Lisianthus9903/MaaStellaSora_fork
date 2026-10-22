@@ -720,15 +720,78 @@
         }
     },
     "邀约_回忆收集_循环": {
-        "action": {
-            "type": "Custom",
+        "max_hit": 2000,
+        "pre_delay": 0,
+        "post_delay": 0,
+        "next": [
+            "邀约_送礼",
+            "邀约_等待选项标记",
+            "邀约_推进对话"
+        ]
+    },
+    "邀约_等待选项标记": {
+        "recognition": {
+            "type": "TemplateMatch",
             "param": {
-                "custom_action": "InviteMemory"
+                "roi": [
+                    760,
+                    280,
+                    450,
+                    340
+                ],
+                "template": [
+                    "Invite/邀约_对话选项按钮.png"
+                ]
+            }
+        },
+        "pre_delay": 0,
+        "action": {
+            "type": "DoNothing"
+        },
+        "post_delay": 1000,
+        "next": [
+            "邀约_送礼",
+            "邀约_特殊回忆选项",
+            "邀约_对话选项按钮",
+            "邀约_推进对话"
+        ],
+        "focus": {
+            "Node.Recognition.Succeeded": "检测到对话选项，等待1秒后识别特殊回忆标记"
+        }
+    },
+    "邀约_特殊回忆选项": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    1160,
+                    280,
+                    60,
+                    340
+                ],
+                "template": [
+                    "Invite/邀约_特殊回忆选项.png"
+                ],
+                "order_by": "Vertical"
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target_offset": [
+                    -180,
+                    20,
+                    0,
+                    0
+                ]
             }
         },
         "next": [
-            "邀约_送礼"
-        ]
+            "邀约_回忆收集_循环"
+        ],
+        "focus": {
+            "Node.Action.Starting": "正在选择带爱心卡片的特殊回忆选项"
+        }
     },
     "邀约_对话选项按钮": {
         "recognition": {
@@ -736,30 +799,47 @@
             "param": {
                 "roi": [
                     760,
-                    330,
+                    280,
                     450,
-                    200
+                    340
                 ],
                 "template": [
                     "Invite/邀约_对话选项按钮.png"
+                ],
+                "order_by": "Vertical",
+                "index": -1
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target_offset": [
+                    120,
+                    0,
+                    0,
+                    0
                 ]
             }
+        },
+        "next": [
+            "邀约_回忆收集_循环"
+        ],
+        "focus": {
+            "Node.Action.Starting": "未发现爱心卡片，正在选择默认对话选项"
         }
     },
-    "邀约_读取选项文本": {
-        "recognition": {
-            "type": "OCR",
+    "邀约_推进对话": {
+        "action": {
+            "type": "Click",
             "param": {
-                "expected": [
-                    "InviteMemory函数专用节点"
-                ],
-                "roi": [
-                    760,
-                    330,
-                    450,
+                "target": [
+                    1000,
                     200
                 ]
             }
-        }
+        },
+        "next": [
+            "邀约_回忆收集_循环"
+        ]
     }
 }
