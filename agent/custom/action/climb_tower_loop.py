@@ -7,6 +7,8 @@ from utils import logger as logger_module
 logger = logger_module.get_logger("climb_tower_loop")
 
 HOME_NODE = "通用_返回主页"
+HOME_NODE_ON = {HOME_NODE: {"enabled": True}}
+HOME_NODE_OFF = {HOME_NODE: {"enabled": False}}
 UNKNOWN = -1
 
 
@@ -26,6 +28,8 @@ class AscensionLoop(CustomAction):
         Returns:
             bool: 返回 True。
         """
+        # 保持返回主页节点启用
+        context.override_pipeline(HOME_NODE_ON)
         # 重置潜能状态
         State.reset()
 
@@ -38,8 +42,7 @@ class AscensionLoop(CustomAction):
         # 纪录目标识别失败：直接停止爬塔流程
         if attachment.get("record_level", -1) < 0 or attachment.get("potential_count", -1) < 0:
             logger.error("纪录等级或纪录潜能数识别失败，为保证爬塔质量，将结束爬塔")
-            context.override_next(argv.node_name, [HOME_NODE])
-            return True
+            return False
 
         # 已达到纪录目标：与爬塔次数用尽一样，正常回到主页结束
         if self._reached_record_target(attachment):
@@ -47,7 +50,6 @@ class AscensionLoop(CustomAction):
                 f"纪录等级 {attachment.get('record_level')}、纪录潜能数 "
                 f"{attachment.get('potential_count')} 已达设定目标，结束爬塔"
             )
-            context.override_next(argv.node_name, [HOME_NODE])
             return True
 
         if loop_count > 0:
@@ -58,9 +60,10 @@ class AscensionLoop(CustomAction):
                     "attach": attachment
                 }
             })
+            # 关闭返回主页节点，以继续爬塔循环
+            context.override_pipeline(HOME_NODE_OFF)
         else:
             logger.info("爬塔已完成，回到主页")
-            context.override_next(argv.node_name, [HOME_NODE])
 
         return True
 
