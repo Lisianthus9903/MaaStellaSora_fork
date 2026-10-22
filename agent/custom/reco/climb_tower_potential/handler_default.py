@@ -207,7 +207,7 @@ class ChoosePotentialHandler:
         if not refresh_result:
             return False
         # 通过检测金币变化来判断是否成功刷新，同时更新当前金币数量
-        wait_time = 20
+        wait_time = 60
         new_coin = -1
         for i in range(wait_time):
             # 1. 阶段一：若尚未确认金币扣减，先检测金币

@@ -109,7 +109,7 @@ class ShopHandler:
         # 开始刷新
         current_refresh_remaining = self.data.refresh_remaining
         self.interactor.context.run_task("星塔_节点_商店_点击刷新_agent")
-        for _ in range(20):
+        for _ in range(60):
             if self.interactor.context.tasker.stopping:
                 return
             self.interactor.screenshot()
