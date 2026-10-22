@@ -26,6 +26,7 @@
         "action": {
             "type": "Click"
         },
+        "timeout": 30000,
         "next": [
             "魔王之塔_主界面"
         ]
