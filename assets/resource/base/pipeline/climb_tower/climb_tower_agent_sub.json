@@ -35,7 +35,6 @@
                     65,
                     25
                 ],
-                "threshold": 0.6,
                 "only_rec": true
             }
         }
