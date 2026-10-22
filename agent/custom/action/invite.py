@@ -84,7 +84,7 @@ class InviteAuto(CustomAction):
                     if context.tasker.stopping:
                         return False
                     # 同一上下文的 max_hit 会累计，每位角色开始邀约前重置对话循环计数
-                    context.clear_hit_count("邀约_回忆收集_循环")
+                    context.clear_hit_count("邀约_推进对话")
                     context.run_task("邀约_开始邀约", pipeline_override)
 
                     break # 无论任务结果如何，只要点到了人，就停止向下翻页

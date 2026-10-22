@@ -307,7 +307,8 @@
         "post_delay": 300,
         "next": [
             "邀约_跳过",
-            "邀约_选择默认地点"
+            "邀约_选择默认地点",
+            "邀约_回忆收集_循环"
         ],
         "focus": {
             "Node.Recognition.Succeeded": "选择默认地点"
@@ -336,7 +337,8 @@
         "post_delay": 300,
         "next": [
             "邀约_跳过",
-            "邀约_选择回忆地点"
+            "邀约_选择回忆地点",
+            "邀约_回忆收集_循环"
         ],
         "focus": {
             "Node.Recognition.Succeeded": "选择回忆地点"
@@ -429,6 +431,7 @@
         "post_wait_freezes": 100
     },
     "邀约_跳过": {
+        "description": "在回忆收集循环选项关闭时，打开该节点，否则关闭该节点",
         "recognition": {
             "type": "TemplateMatch",
             "param": {
@@ -720,13 +723,14 @@
         }
     },
     "邀约_回忆收集_循环": {
-        "max_hit": 2000,
+        "description": "在回忆收集循环选项打开时，打开该节点，否则关闭该节点",
+        "enabled": false,
         "pre_delay": 0,
         "post_delay": 0,
         "next": [
             "邀约_送礼",
-            "邀约_等待选项标记",
-            "邀约_推进对话"
+            "[JumpBack]邀约_等待选项标记",
+            "[JumpBack]邀约_推进对话"
         ]
     },
     "邀约_等待选项标记": {
@@ -748,16 +752,11 @@
         "action": {
             "type": "DoNothing"
         },
-        "post_delay": 1000,
+        "post_wait_freezes": 100,
         "next": [
-            "邀约_送礼",
             "邀约_特殊回忆选项",
-            "邀约_对话选项按钮",
-            "邀约_推进对话"
-        ],
-        "focus": {
-            "Node.Recognition.Succeeded": "检测到对话选项，等待1秒后识别特殊回忆标记"
-        }
+            "邀约_对话选项按钮"
+        ]
     },
     "邀约_特殊回忆选项": {
         "recognition": {
@@ -771,8 +770,7 @@
                 ],
                 "template": [
                     "Invite/邀约_特殊回忆选项.png"
-                ],
-                "order_by": "Vertical"
+                ]
             }
         },
         "action": {
@@ -786,11 +784,8 @@
                 ]
             }
         },
-        "next": [
-            "邀约_回忆收集_循环"
-        ],
         "focus": {
-            "Node.Action.Starting": "正在选择带爱心卡片的特殊回忆选项"
+            "Node.Action.Starting": "选择带爱心卡片的特殊回忆选项"
         }
     },
     "邀约_对话选项按钮": {
@@ -821,14 +816,12 @@
                 ]
             }
         },
-        "next": [
-            "邀约_回忆收集_循环"
-        ],
         "focus": {
-            "Node.Action.Starting": "未发现爱心卡片，正在选择默认对话选项"
+            "Node.Action.Starting": "未发现爱心卡片，选择默认对话选项"
         }
     },
     "邀约_推进对话": {
+        "max_hit": 2000,
         "action": {
             "type": "Click",
             "param": {
@@ -837,9 +830,6 @@
                     200
                 ]
             }
-        },
-        "next": [
-            "邀约_回忆收集_循环"
-        ]
+        }
     }
 }
