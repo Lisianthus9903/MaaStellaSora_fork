@@ -27,7 +27,7 @@ QQ交流群：**1063132902**  密码：**星塔旅人**
 ## 安装与使用
 
 ### 桌面端（Windows/Linux/macOS）  / 安卓模拟器
-> 星塔助手目前只对比例为16:9的游戏客户端提供支持，如果你的游戏客户端比例不为16:9请自行寻找改分辨率方法或是使用模拟器
+> 星塔助手桌面端目前只对比例为16:9的游戏客户端提供支持，如果你的游戏客户端比例不为16:9请自行寻找改分辨率方法或是使用模拟器
 
 1. 前往 [GitHub Releases](https://github.com/MaaStellaSora/MaaStellaSora/releases) 下载对应系统的压缩包。
 2. 当前构建与发行使用 **MFAAvalonia**：下载 `MaaStellaSora-{系统}-{架构}-vX.Y.Z.zip`（Windows）或对应的 `.tar.gz`（Linux/macOS），支持现有全部发布平台及自动更新。MXU 构建暂时停用，历史版本的可用包以对应 Release 为准。
@@ -39,6 +39,7 @@ QQ交流群：**1063132902**  密码：**星塔旅人**
 1. 前往 [GitHub Releases](https://github.com/MaaStellaSora/MaaStellaSora/releases) 下载 `MaaStellaSora-android-arm64-v8a-vX.Y.Z.apk`。
 2. 安卓端构建与发行使用 **MaaFwApp**，暂时只支持通过GitHub更新。
 3. 下载后，直接打开安装，即可使用。
+4. 使用时，需要先根据提示，使用内置的**Shizuku**权限管理工具获取权限，然后授权MaaStellaSora才能正常使用。
 
 
 ## 参与开发或贡献
