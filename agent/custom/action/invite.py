@@ -164,7 +164,7 @@ class InviteAuto(CustomAction):
                 bool: 选择到目标对象时返回True，未能选择到目标对象时返回False
         """
         # 参数
-        similarity_limit = 0.8 # 文本相似度阈值
+        similarity_limit = 0.65  # 文本相似度阈值
 
         # 处理旅人名字的文本问题，把全角括号都换成半角括号，把空格都取消
         formatted_name = self._normalize_name(trekker_name)
