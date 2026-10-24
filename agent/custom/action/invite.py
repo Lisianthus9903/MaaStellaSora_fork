@@ -221,8 +221,7 @@ class InviteAuto(CustomAction):
 
         # 过滤掉低于识别阈值的结果，或以P开头的乱码结果
         results = [r for r in results if r.score >= threshold
-                   and not (r.text.startswith('P') and not r.text.isascii())
-                   and r.text != 'P' and r.text != 'PI']
+                   and not (r.text.startswith('P') and (not r.text.isascii() or r.text.isupper()))]
         # 按 Y 坐标排序，确保从上往下处理
         results.sort(key=lambda r: r.box[1])
 
