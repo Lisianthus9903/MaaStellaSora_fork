@@ -180,8 +180,9 @@ class InviteAuto(CustomAction):
             return False
 
         # 整理识别结果
+        self.logger.debug(f"左方邀约对象识别结果: {reco_detail.all_results}")
         results = self._get_refined_merge(reco_detail.all_results)
-        self.logger.debug(f"识别出{len(results)}个结果，开始比较")
+        self.logger.debug(f"筛选出{len(results)}个结果：{results}，开始比较")
 
         # 比较文本相似程度，如果相似程度高，则点击，并返回True，否则返回False
         for result in results:
