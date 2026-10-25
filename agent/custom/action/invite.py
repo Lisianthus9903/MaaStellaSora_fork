@@ -164,10 +164,12 @@ class InviteAuto(CustomAction):
                 bool: 选择到目标对象时返回True，未能选择到目标对象时返回False
         """
         # 参数
-        similarity_limit = 0.65  # 文本相似度阈值
+        similarity_limit = 0.75  # 文本相似度阈值
 
         # 处理旅人名字的文本问题，把全角括号都换成半角括号，把空格都取消
         formatted_name = self._normalize_name(trekker_name)
+        # 文本长度差阈值
+        max_allowed_diff = 1 if len(formatted_name) <= 7 else 2
 
         # 识别对象
         if context.tasker.stopping:
@@ -189,15 +191,22 @@ class InviteAuto(CustomAction):
             # 使用difflib库计算文本相似度
             formatted_result = self._normalize_name(result['text'])
             similarity = difflib.SequenceMatcher(None, formatted_result, formatted_name).ratio()
+            # 计算文本长度差
+            len_diff = abs(len(formatted_result) - len(formatted_name))
+            # 检查首尾是否匹配
+            is_first_match = formatted_result[0] == formatted_name[0]
+            is_last_match = formatted_result[-1] == formatted_name[-1]
 
-            if similarity >= similarity_limit:
+            if similarity >= similarity_limit and len_diff <= max_allowed_diff and (is_first_match or is_last_match):
                 if context.tasker.stopping:
                     return False
-                self.logger.debug(f"识别成功！预期: {formatted_name}, 识别结果: {formatted_result}, 相似度: {similarity:.2f}")
+                self.logger.debug(f"识别成功！预期: {formatted_name}, 识别结果: {formatted_result},"
+                                  f" 相似度: {similarity:.2f}")
                 context.tasker.controller.post_click(result['x'], result['y']).wait()
                 self.logger.debug(f"点击坐标{result['x']},{result['y']}完成")
                 return True
-            self.logger.debug(f"识别失败！预期: {formatted_name}, 识别结果: {formatted_result}, 相似度: {similarity:.2f}")
+            self.logger.debug(f"识别失败！预期: {formatted_name}, 识别结果: {formatted_result},"
+                              f" 相似度: {similarity:.2f}")
         return False
 
     @staticmethod
