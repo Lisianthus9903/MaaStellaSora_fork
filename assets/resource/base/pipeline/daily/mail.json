@@ -43,10 +43,7 @@
         },
         "next": [
             "邮箱_一键领取"
-        ],
-        "focus": {
-            "Node.Action.Starting": "正在打开邮箱"
-        }
+        ]
     },
     "邮箱_一键领取": {
         "recognition": {
@@ -63,9 +60,6 @@
         "timeout": 2000,
         "next": [
             "通用_返回主页"
-        ],
-        "focus": {
-            "Node.Action.Starting": "正在尝试一键领取"
-        }
+        ]
     }
 }

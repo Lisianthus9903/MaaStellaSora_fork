@@ -92,10 +92,7 @@
             "[JumpBack]通用_点击空白处继续",
             "[JumpBack]登录_点击文字",
             "[JumpBack]登录_通用签到"
-        ],
-        "focus": {
-            "Node.Action.Starting": "正在尝试进入游戏"
-        }
+        ]
     },
     "登录_登录": {
         "action": {
@@ -123,10 +120,7 @@
         "action": {
             "type": "Click"
         },
-        "timeout": 10000,
-        "focus": {
-            "Node.Action.Starting": "正在尝试登录悠星账号"
-        }
+        "timeout": 10000
     },
     "登录_点击文字": {
         "recognition": {

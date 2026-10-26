@@ -88,10 +88,7 @@
         "post_delay": 1500,
         "next": [
             "灾变防线_选择关卡"
-        ],
-        "focus": {
-            "Node.Recognition.Succeeded": "灾变防线：选择灾变难度"
-        }
+        ]
     },
     "灾变防线_选择关卡": {
         "recognition": {

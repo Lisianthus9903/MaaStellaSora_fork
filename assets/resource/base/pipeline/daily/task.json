@@ -143,10 +143,7 @@
         },
         "next": [
             "任务_每周事务"
-        ],
-        "focus": {
-            "Node.Action.Starting": "正在尝试领取任务奖励"
-        }
+        ]
     },
     "任务_领取额外奖励": {
         "recognition": {

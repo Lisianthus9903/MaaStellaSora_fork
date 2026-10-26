@@ -29,10 +29,7 @@
         },
         "next": [
             "邀约_前往邀约"
-        ],
-        "focus": {
-            "Node.Action.Starting": "正在打开心链"
-        }
+        ]
     },
     "邀约_开始邀约": {
         "recognition": {
@@ -194,19 +191,13 @@
         },
         "next": [
             "邀约_总循环"
-        ],
-        "focus": {
-            "Node.Recognition.Succeeded": "邀约_主界面"
-        }
+        ]
     },
     "邀约_入口": {
         "next": [
             "邀约_判断是否在主页",
             "[JumpBack]通用_返回主页"
-        ],
-        "focus": {
-            "Node.Recognition.Succeeded": "执行邀约"
-        }
+        ]
     },
     "邀约_前往邀约": {
         "recognition": {
@@ -230,10 +221,7 @@
         "next": [
             "邀约_主界面",
             "邀约_前往邀约"
-        ],
-        "focus": {
-            "Node.Recognition.Succeeded": "邀约_前往邀约"
-        }
+        ]
     },
     "邀约_地点": {
         "recognition": {
@@ -404,9 +392,6 @@
         },
         "action": {
             "type": "Click"
-        },
-        "focus": {
-            "Node.Action.Succeeded": "点击邀约确认按钮"
         }
     },
     "邀约_送礼后快进": {
@@ -450,10 +435,7 @@
         "next": [
             "邀约_跳过",
             "邀约_送礼"
-        ],
-        "focus": {
-            "Node.Recognition.Succeeded": "跳过邀约"
-        }
+        ]
     },
     "邀约_还是算了": {
         "recognition": {
@@ -478,7 +460,7 @@
             "邀约_默契提升"
         ],
         "focus": {
-            "Node.Recognition.Succeeded": "还是算了"
+            "Node.Recognition.Succeeded": "选择不送礼物"
         }
     },
     "邀约_送出礼物": {
@@ -506,7 +488,7 @@
             "[JumpBack]邀约_送礼后快进"
         ],
         "focus": {
-            "Node.Recognition.Succeeded": "邀约_送出礼物"
+            "Node.Recognition.Succeeded": "选择送出礼物"
         }
     },
     "邀约_送礼": {
@@ -532,10 +514,7 @@
         "next": [
             "邀约_送礼流程",
             "邀约_送礼"
-        ],
-        "focus": {
-            "Node.Recognition.Succeeded": "正在送礼"
-        }
+        ]
     },
     "邀约_送礼流程": {
         "recognition": {

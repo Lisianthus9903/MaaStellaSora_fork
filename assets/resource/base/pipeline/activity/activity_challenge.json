@@ -73,10 +73,7 @@
         "post_wait_freezes": 100,
         "next": [
             "活动挑战_随机选择关卡"
-        ],
-        "focus": {
-            "Node.Action.Starting": "正在选择活动挑战难度"
-        }
+        ]
     },
     "活动挑战_识别可选关卡": {
         "recognition": {
@@ -132,10 +129,7 @@
         "post_wait_freezes": 100,
         "next": [
             "选择纪录_进入主界面"
-        ],
-        "focus": {
-            "Node.Action.Starting": "正在点击活动挑战出发"
-        }
+        ]
     },
     "活动挑战_结算并返回": {
         "recognition": {

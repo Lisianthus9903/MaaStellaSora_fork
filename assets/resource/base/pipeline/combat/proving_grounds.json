@@ -222,7 +222,7 @@
         "focus": {
             "Node.Action.Succeeded": {
                 "content": "没有默认纪录，请先选择纪录挑战一次再使用真格挑战模块",
-                "display": "notification"
+                "display": ["log", "notification"]
             }
         }
     }

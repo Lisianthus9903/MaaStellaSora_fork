@@ -59,10 +59,7 @@
         "next": [
             "活动快速战斗_确认",
             "[JumpBack]通用_关闭升级界面"
-        ],
-        "focus": {
-            "Node.Action.Starting": "点击开始战斗"
-        }
+        ]
     },
     "活动快速战斗_添加战斗次数": {
         "recognition": {
@@ -83,11 +80,7 @@
         ],
         "on_error": [
             "通用_返回主页"
-        ],
-        "focus": {
-            "Node.Recognition.Failed": "检测到没有通关活动关卡 继续下一步",
-            "Node.Action.Starting": "正在添加战斗次数"
-        }
+        ]
     },
     "活动快速战斗_选择活动难度": {
         "recognition": {
@@ -121,10 +114,7 @@
         "next": [
             "通用_返回主页",
             "[JumpBack]通用_关闭升级界面"
-        ],
-        "focus": {
-            "Node.Action.Succeeded": "正在点击确认"
-        }
+        ]
     },
     "活动快速战斗_选择活动关卡": {
         "recognition": {

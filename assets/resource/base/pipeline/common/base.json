@@ -14,10 +14,7 @@
         "timeout": 1500,
         "next": [
             "通用_点击空白处继续"
-        ],
-        "focus": {
-            "Node.Action.Starting": "正在尝试一键领取"
-        }
+        ]
     },
     "通用_换算快速作战次数": {
         "recognition": {
@@ -244,9 +241,6 @@
         "post_wait_freezes": {
             "time": 100,
             "timeout": 1500
-        },
-        "focus": {
-            "Node.Action.Starting": "正在关闭升级界面"
         }
     },
     "通用_主页_出发": {

@@ -64,10 +64,7 @@
         ],
         "on_error": [
             "通用_返回主页"
-        ],
-        "focus": {
-            "Node.Action.Succeeded": "前往委托"
-        }
+        ]
     },
     "委托_一键领取": {
         "recognition": {
@@ -88,10 +85,7 @@
             "[JumpBack]委托_跳过",
             "委托_再次派遣",
             "[JumpBack]通用_关闭升级界面"
-        ],
-        "focus": {
-            "Node.Action.Starting": "正在尝试一键领取"
-        }
+        ]
     },
     "委托_跳过": {
         "recognition": {

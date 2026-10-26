@@ -44,10 +44,7 @@
         "post_wait_freezes": 2000,
         "next": [
             "心链_点击邮寄"
-        ],
-        "focus": {
-            "Node.Action.Starting": "正在打开心链"
-        }
+        ]
     },
     "心链_点击邮寄": {
         "recognition": {
@@ -63,10 +60,7 @@
         },
         "next": [
             "心链_选择礼物"
-        ],
-        "focus": {
-            "Node.Action.Starting": "正在点击邮寄按钮"
-        }
+        ]
     },
     "心链_赠送礼物": {
         "recognition": {
@@ -84,10 +78,7 @@
         "next": [
             "心链_默契提升",
             "通用_返回主页"
-        ],
-        "focus": {
-            "Node.Action.Starting": "正在赠送礼物"
-        }
+        ]
     },
     "心链_选择礼物": {
         "recognition": {
@@ -106,8 +97,7 @@
             "心链_赠送礼物"
         ],
         "focus": {
-            "Node.Recognition.Failed": "没有找到礼物图标 可能是没有礼物 跳过",
-            "Node.Recognition.Starting": "正在选择礼物"
+            "Node.Recognition.Failed": "没有找到礼物图标 可能是没有礼物"
         }
     },
     "心链_默契提升": {
@@ -125,9 +115,6 @@
         },
         "next": [
             "通用_返回主页"
-        ],
-        "focus": {
-            "Node.Action.Starting": "正在关闭弹窗"
-        }
+        ]
     }
 }
