@@ -98,6 +98,16 @@ class PipelineI18nTests(unittest.TestCase):
 
         self.assertEqual(check(self.root), [])
 
+    def test_resolves_symlinked_project_root(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            alias = Path(temp_dir) / "project"
+            try:
+                alias.symlink_to(self.root, target_is_directory=True)
+            except (NotImplementedError, OSError) as error:
+                self.skipTest(f"directory symlinks are unavailable: {error}")
+
+            self.assertEqual(check(alias), [])
+
 
 if __name__ == "__main__":
     unittest.main()

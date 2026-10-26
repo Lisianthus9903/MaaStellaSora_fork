@@ -381,6 +381,7 @@ def load_translations(
 
 
 def check(root: Path) -> list[Finding]:
+    root = root.resolve()
     interface_path = root / "assets" / "interface.json"
     try:
         interface = load_json(interface_path)
