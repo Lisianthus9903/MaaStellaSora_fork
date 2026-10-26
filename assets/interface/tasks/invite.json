@@ -74,9 +74,6 @@
                                 "{1号}"
                             ]
                         }
-                    },
-                    "focus": {
-                        "Node.Recognition.Succeeded": "尝试邀约_{1号}"
                     }
                 },
                 "邀约_2号": {
@@ -86,9 +83,6 @@
                                 "{2号}"
                             ]
                         }
-                    },
-                    "focus": {
-                        "Node.Recognition.Succeeded": "尝试邀约_{2号}"
                     }
                 },
                 "邀约_3号": {
@@ -98,9 +92,6 @@
                                 "{3号}"
                             ]
                         }
-                    },
-                    "focus": {
-                        "Node.Recognition.Succeeded": "尝试邀约_{3号}"
                     }
                 },
                 "邀约_4号": {
@@ -110,9 +101,6 @@
                                 "{4号}"
                             ]
                         }
-                    },
-                    "focus": {
-                        "Node.Recognition.Succeeded": "尝试邀约_{4号}"
                     }
                 },
                 "邀约_5号": {
@@ -122,9 +110,6 @@
                                 "{5号}"
                             ]
                         }
-                    },
-                    "focus": {
-                        "Node.Recognition.Succeeded": "尝试邀约_{5号}"
                     }
                 }
             }
