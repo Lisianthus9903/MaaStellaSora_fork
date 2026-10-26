@@ -71,7 +71,7 @@
             "魔王之塔_领取馈赠成功"
         ],
         "focus": {
-            "Node.Action.Succeeded": "当前可领取每日馈赠，点击领取馈赠"
+            "Node.Action.Succeeded": "$pipeline.魔王之塔_领取馈赠.focus.Node.Action.Succeeded"
         }
     },
     "魔王之塔_领取馈赠成功": {
@@ -143,7 +143,7 @@
             "魔王之塔_默契提升"
         ],
         "focus": {
-            "Node.Action.Succeeded": "当前可轻抚，点击轻抚"
+            "Node.Action.Succeeded": "$pipeline.魔王之塔_轻抚.focus.Node.Action.Succeeded"
         }
     },
     "魔王之塔_默契提升": {
@@ -181,7 +181,7 @@
         "pre_delay": 0,
         "post_delay": 0,
         "focus": {
-            "Node.Action.Succeeded": "魔王之塔日常完成"
+            "Node.Action.Succeeded": "$pipeline.魔王之塔_完成.focus.Node.Action.Succeeded"
         }
     }
 }

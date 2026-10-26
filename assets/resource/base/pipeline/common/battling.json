@@ -19,7 +19,7 @@
             "[JumpBack]通用战斗_打开自动战斗"
         ],
         "focus": {
-            "Node.Action.Succeeded": "进入战斗"
+            "Node.Action.Succeeded": "$pipeline.通用战斗_进入战斗界面.focus.Node.Action.Succeeded"
         }
     },
     "通用战斗_自动战斗是否已打开": {
@@ -90,7 +90,7 @@
             }
         },
         "focus": {
-            "Node.Action.Succeeded": "战斗结束"
+            "Node.Action.Succeeded": "$pipeline.通用战斗_战斗结束.focus.Node.Action.Succeeded"
         }
     }
 }

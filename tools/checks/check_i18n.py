@@ -22,7 +22,7 @@ DISPLAY_ARRAYS = {
     "setting",
     "task",
 }
-SERVER_SUFFIX = re.compile(r"_(?:cn|tw|jp|en|kr)\.json$", re.IGNORECASE)
+LANGUAGE_SUFFIX = re.compile(r"_(?:cn|tw|jp|en|kr)\.json$", re.IGNORECASE)
 
 
 @dataclass
@@ -126,6 +126,46 @@ def load_json(path: Path) -> Any:
     return json.loads(strip_json_extensions(text), object_pairs_hook=reject_duplicate_keys)
 
 
+def is_language_specific(path: Path) -> bool:
+    return LANGUAGE_SUFFIX.search(path.name) is not None
+
+
+def collect_focus_template(value: Any, location: str, result: ScanResult) -> None:
+    if isinstance(value, dict):
+        content = value.get("content")
+        if isinstance(content, str):
+            collect_focus_template(content, f"{location}.content", result)
+    elif isinstance(value, str):
+        if value.startswith("$"):
+            i18n_key = value[1:]
+            if not i18n_key:
+                result.findings.append(Finding("empty i18n key", location))
+            else:
+                result.add_reference(i18n_key, location)
+        elif CHINESE_TEXT.search(value):
+            result.findings.append(
+                Finding("hardcoded Chinese in a Pipeline focus message", location)
+            )
+
+
+def collect_pipeline_override_focus(pipeline: Any, location: str, result: ScanResult) -> None:
+    if not isinstance(pipeline, dict):
+        return
+
+    for node_name, node in pipeline.items():
+        if not isinstance(node, dict):
+            continue
+        focus = node.get("focus")
+        if not isinstance(focus, dict):
+            continue
+        for message, template in focus.items():
+            collect_focus_template(
+                template,
+                f"{location}.{node_name}.focus.{message}",
+                result,
+            )
+
+
 def collect_strings(
     value: Any,
     location: str,
@@ -200,7 +240,7 @@ def imported_task_paths(root: Path, interface: dict[str, Any], result: ScanResul
         if not isinstance(imported, str):
             result.findings.append(Finding("import path must be a string", location))
             continue
-        if SERVER_SUFFIX.search(Path(imported).name):
+        if is_language_specific(Path(imported)):
             continue
 
         path = (assets / imported).resolve()
@@ -229,8 +269,72 @@ class InterfaceScope:
         return result
 
 
-# Add future checks (for example, Pipeline sources) by implementing CheckScope here.
-CHECK_SCOPES: tuple[CheckScope, ...] = (InterfaceScope(),)
+class PipelineOverrideScope:
+    name = "pipeline_override"
+
+    def scan(self, root: Path, interface: dict[str, Any]) -> ScanResult:
+        result = ScanResult()
+        for path in imported_task_paths(root, interface, result):
+            try:
+                source = load_json(path)
+            except (OSError, UnicodeError, json.JSONDecodeError, DuplicateKeyError) as error:
+                result.findings.append(Finding(f"cannot read JSON: {error}", str(path)))
+                continue
+            self._scan_value(source, path.relative_to(root).as_posix(), result)
+        return result
+
+    def _scan_value(self, value: Any, location: str, result: ScanResult) -> None:
+        if isinstance(value, dict):
+            for key, child in value.items():
+                child_location = f"{location}.{key}"
+                if key == "pipeline_override":
+                    collect_pipeline_override_focus(child, child_location, result)
+                    continue
+
+                self._scan_value(child, child_location, result)
+        elif isinstance(value, list):
+            for index, child in enumerate(value):
+                self._scan_value(child, f"{location}[{index}]", result)
+
+
+class PipelineScope:
+    name = "pipeline"
+
+    def scan(self, root: Path, interface: dict[str, Any]) -> ScanResult:
+        result = ScanResult()
+        pipeline_root = root / "assets" / "resource"
+        for path in sorted(pipeline_root.rglob("*.json")):
+            relative_path = path.relative_to(root)
+            if is_language_specific(path) or any(
+                part.startswith(".") for part in relative_path.parts
+            ):
+                continue
+            try:
+                source = load_json(path)
+            except (OSError, UnicodeError, json.JSONDecodeError, DuplicateKeyError) as error:
+                result.findings.append(Finding(f"cannot read JSON: {error}", str(path)))
+                continue
+            if not isinstance(source, dict):
+                continue
+
+            location = relative_path.as_posix()
+            for node_name, node in source.items():
+                if not isinstance(node, dict) or not isinstance(node.get("focus"), dict):
+                    continue
+                for message, template in node["focus"].items():
+                    collect_focus_template(
+                        template,
+                        f"{location}.{node_name}.focus.{message}",
+                        result,
+                    )
+        return result
+
+
+CHECK_SCOPES: tuple[CheckScope, ...] = (
+    InterfaceScope(),
+    PipelineOverrideScope(),
+    PipelineScope(),
+)
 
 
 def load_translations(

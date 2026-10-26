@@ -86,7 +86,7 @@
         "pre_delay": 0,
         "post_delay": 0,
         "focus": {
-            "Node.Action.Succeeded": "猎影合围任务完成"
+            "Node.Action.Succeeded": "$pipeline.猎影合围_任务完成.focus.Node.Action.Succeeded"
         }
     },
     "猎影合围_围猎等级提升": {
@@ -132,7 +132,7 @@
             "[JumpBack]猎影合围_追踪目标_点击跳过按钮"
         ],
         "focus": {
-            "Node.Action.Succeeded": "开始追踪目标"
+            "Node.Action.Succeeded": "$pipeline.猎影合围_追踪目标.focus.Node.Action.Succeeded"
         }
     },
     "猎影合围_追踪目标_领取奖励": {
@@ -154,7 +154,7 @@
             "type": "Click"
         },
         "focus": {
-            "Node.Action.Succeeded": "讨伐完成，领取奖励"
+            "Node.Action.Succeeded": "$pipeline.猎影合围_追踪目标_领取奖励.focus.Node.Action.Succeeded"
         }
     },
     "__猎影合围_追踪目标_再次讨伐按钮": {
@@ -198,7 +198,7 @@
             "猎影合围_追踪目标_点击入口图标"
         ],
         "focus": {
-            "Node.Action.Succeeded": "正在等待讨伐完成，等待1分钟"
+            "Node.Action.Succeeded": "$pipeline.猎影合围_追踪目标_等待1分钟.focus.Node.Action.Succeeded"
         }
     },
     "猎影合围_追踪目标_点击入口图标": {
@@ -227,7 +227,7 @@
             }
         },
         "focus": {
-            "Node.Action.Succeeded": "出击完成，结束追踪目标任务"
+            "Node.Action.Succeeded": "$pipeline.猎影合围_追踪目标_不等待讨伐完成.focus.Node.Action.Succeeded"
         }
     },
     "猎影合围_追踪目标_主界面": {
@@ -261,7 +261,7 @@
             "猎影合围_追踪目标_进入战斗"
         ],
         "focus": {
-            "Node.Action.Succeeded": "追踪目标成功，前往讨伐"
+            "Node.Action.Succeeded": "$pipeline.猎影合围_追踪目标_追踪完成.focus.Node.Action.Succeeded"
         }
     },
     "猎影合围_追踪目标_进入战斗": {
@@ -366,7 +366,7 @@
             "[JumpBack]猎影合围_追踪目标_返回主界面"
         ],
         "focus": {
-            "Node.Action.Succeeded": "追踪委托书不足，结束追踪目标任务"
+            "Node.Action.Succeeded": "$pipeline.猎影合围_追踪目标_追踪委托书不足.focus.Node.Action.Succeeded"
         }
     },
     "猎影合围_是否处于主界面": {
@@ -419,7 +419,7 @@
             "[JumpBack]猎影合围_协助_点击进入协助讨伐" // 新赛季开始时初次进入界面会有一个弹窗把点击吃掉，这里做一个兜底
         ],
         "focus": {
-            "Node.Action.Succeeded": "开始协助讨伐"
+            "Node.Action.Succeeded": "$pipeline.猎影合围_协助讨伐.focus.Node.Action.Succeeded"
         }
     },
     "猎影合围_协助_协助讨伐主界面": {
@@ -518,7 +518,7 @@
             "猎影合围_协助_返回主界面"
         ],
         "focus": {
-            "Node.Action.Succeeded": "围猎许可证不足，协助讨伐完成"
+            "Node.Action.Succeeded": "$pipeline.猎影合围_协助_围猎许可证不足.focus.Node.Action.Succeeded"
         }
     },
     "__猎影合围_协助_没有可以讨伐的目标": {
@@ -556,7 +556,7 @@
             "猎影合围_协助_等待1分钟"
         ],
         "focus": {
-            "Node.Action.Succeeded": "没有可以讨伐的目标，尝试等待"
+            "Node.Action.Succeeded": "$pipeline.猎影合围_协助_没有可以讨伐的目标.focus.Node.Action.Succeeded"
         }
     },
     "猎影合围_协助_等待1分钟": {
@@ -566,7 +566,7 @@
             "猎影合围_协助_点击进入协助讨伐"
         ],
         "focus": {
-            "Node.Action.Succeeded": "等待1分钟……"
+            "Node.Action.Succeeded": "$pipeline.猎影合围_协助_等待1分钟.focus.Node.Action.Succeeded"
         }
     },
     "猎影合围_协助_点击进入协助讨伐": {

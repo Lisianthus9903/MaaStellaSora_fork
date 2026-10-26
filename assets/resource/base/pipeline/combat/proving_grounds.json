@@ -116,7 +116,7 @@
             }
         },
         "focus": {
-            "Node.Action.Succeeded": "挑战次数已用完，任务完成"
+            "Node.Action.Succeeded": "$pipeline.真格挑战_识别是否用光挑战次数.focus.Node.Action.Succeeded"
         }
     },
     "__真格挑战_选择首领": {
@@ -158,7 +158,7 @@
             "真格挑战_开始挑战"
         ],
         "focus": {
-            "Node.Action.Succeeded": "选择首领：寄生之庭"
+            "Node.Action.Succeeded": "$pipeline.真格挑战_有挑战次数时选择首领.focus.Node.Action.Succeeded"
         }
     },
     "真格挑战_开始挑战": {
@@ -221,7 +221,7 @@
         },
         "focus": {
             "Node.Action.Succeeded": {
-                "content": "没有默认纪录，请先选择纪录挑战一次再使用真格挑战模块",
+                "content": "$pipeline.真格挑战_没有默认纪录.focus.Node.Action.Succeeded",
                 "display": ["log", "notification"]
             }
         }

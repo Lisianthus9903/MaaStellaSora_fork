@@ -32,7 +32,7 @@
                         },
                         "真格挑战_有挑战次数时选择首领": {
                             "focus": {
-                                "Node.Action.Succeeded": "选择首领：寄生之庭"
+                                "Node.Action.Succeeded": "$interface.task.option.真格挑战_选择首领.cases.真格挑战_选择首领_首领1.pipeline_override.真格挑战_有挑战次数时选择首领.focus.Node.Action.Succeeded"
                             }
                         }
                     }
@@ -53,7 +53,7 @@
                         },
                         "真格挑战_有挑战次数时选择首领": {
                             "focus": {
-                                "Node.Action.Succeeded": "选择首领：猛进之灵"
+                                "Node.Action.Succeeded": "$interface.task.option.真格挑战_选择首领.cases.真格挑战_选择首领_首领2.pipeline_override.真格挑战_有挑战次数时选择首领.focus.Node.Action.Succeeded"
                             }
                         }
                     }
@@ -74,7 +74,7 @@
                         },
                         "真格挑战_有挑战次数时选择首领": {
                             "focus": {
-                                "Node.Action.Succeeded": "选择首领：魔侍巨像"
+                                "Node.Action.Succeeded": "$interface.task.option.真格挑战_选择首领.cases.真格挑战_选择首领_首领3.pipeline_override.真格挑战_有挑战次数时选择首领.focus.Node.Action.Succeeded"
                             }
                         }
                     }
@@ -95,7 +95,7 @@
                         },
                         "真格挑战_有挑战次数时选择首领": {
                             "focus": {
-                                "Node.Action.Succeeded": "选择首领：流风美人"
+                                "Node.Action.Succeeded": "$interface.task.option.真格挑战_选择首领.cases.真格挑战_选择首领_首领4.pipeline_override.真格挑战_有挑战次数时选择首领.focus.Node.Action.Succeeded"
                             }
                         }
                     }
@@ -116,7 +116,7 @@
                         },
                         "真格挑战_有挑战次数时选择首领": {
                             "focus": {
-                                "Node.Action.Succeeded": "选择首领：翠煌之刃"
+                                "Node.Action.Succeeded": "$interface.task.option.真格挑战_选择首领.cases.真格挑战_选择首领_首领5.pipeline_override.真格挑战_有挑战次数时选择首领.focus.Node.Action.Succeeded"
                             }
                         }
                     }
@@ -137,7 +137,7 @@
                         },
                         "真格挑战_有挑战次数时选择首领": {
                             "focus": {
-                                "Node.Action.Succeeded": "选择首领：咕噜六角鲸"
+                                "Node.Action.Succeeded": "$interface.task.option.真格挑战_选择首领.cases.真格挑战_选择首领_首领6.pipeline_override.真格挑战_有挑战次数时选择首领.focus.Node.Action.Succeeded"
                             }
                         }
                     }

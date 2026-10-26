@@ -340,7 +340,7 @@
                         }
                     },
                     "focus": {
-                        "Node.Action.Succeeded": "选择难度_{难度}"
+                        "Node.Action.Succeeded": "$interface.task.option.选择悬赏试炼难度.pipeline_override.战斗_选择难度.focus.Node.Action.Succeeded"
                     }
                 }
             }

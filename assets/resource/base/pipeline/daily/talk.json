@@ -97,7 +97,7 @@
             "心链_赠送礼物"
         ],
         "focus": {
-            "Node.Recognition.Failed": "没有找到礼物图标 可能是没有礼物"
+            "Node.Recognition.Failed": "$pipeline.心链_选择礼物.focus.Node.Recognition.Failed"
         }
     },
     "心链_默契提升": {
