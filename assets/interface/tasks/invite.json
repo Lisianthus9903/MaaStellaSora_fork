@@ -344,9 +344,6 @@
                     "name": "No",
                     "label": "No",
                     "pipeline_override": {
-                        "邀约_跳过": {
-                            "enabled": true
-                        },
                         "邀约_回忆收集_循环": {
                             "enabled": false
                         }
@@ -356,9 +353,6 @@
                     "name": "Yes",
                     "label": "Yes",
                     "pipeline_override": {
-                        "邀约_跳过": {
-                            "enabled": false
-                        },
                         "邀约_回忆收集_循环": {
                             "enabled": true
                         }
