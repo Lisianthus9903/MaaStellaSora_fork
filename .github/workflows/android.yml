@@ -150,7 +150,7 @@ jobs:
         run: |
           python3 "$PROJECT_ROOT/tools/ci/configure.py" \
             --assets-dir "$PROJECT_ROOT/assets" \
-            --ocr-dir "$PROJECT_ROOT/android-build/pi/resource/base/model/ocr"
+            --ocr-dir "$PROJECT_ROOT/android-build/pi/resource/base/model/ocr"             --kr-ocr-dir "$PROJECT_ROOT/android-build/pi/resource/kr/model/ocr"
 
       - name: Generate MaaFwApp profile
         env:
@@ -365,6 +365,9 @@ jobs:
                   "resource/base/model/ocr/det.onnx",
                   "resource/base/model/ocr/rec.onnx",
                   "resource/base/model/ocr/keys.txt",
+                  "resource/kr/model/ocr/det.onnx",
+                  "resource/kr/model/ocr/rec.onnx",
+                  "resource/kr/model/ocr/keys.txt",
               }
               missing_ocr_files = required_ocr_files - pi_names
               if missing_ocr_files:

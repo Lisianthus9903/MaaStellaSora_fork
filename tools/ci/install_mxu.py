@@ -16,7 +16,7 @@ WORKING_DIR = SCRIPT_DIR.parent.parent
 if str(SCRIPT_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPT_DIR))
 
-from configure import configure_ocr_model  # noqa: E402
+from configure import configure_kr_ocr_model, configure_ocr_model  # noqa: E402
 from package_common import (  # noqa: E402
     COPY_IGNORE,
     PROJECT_FILES,
@@ -124,6 +124,9 @@ def _copy_project_payload(working_dir: Path, install_dir: Path, version: str) ->
     )
     configure_ocr_model(
         assets_dir, install_dir / "resource" / "base" / "model" / "ocr"
+    )
+    configure_kr_ocr_model(
+        assets_dir, install_dir / "resource" / "kr" / "model" / "ocr"
     )
     _copy_tree(assets_dir / "interface", install_dir / "interface")
     _copy_tree(assets_dir / "i18n", install_dir / "i18n")

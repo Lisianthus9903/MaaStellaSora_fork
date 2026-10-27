@@ -11,7 +11,7 @@ WORKING_DIR = SCRIPT_DIR.parent.parent
 if str(SCRIPT_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPT_DIR))
 
-from configure import configure_ocr_model
+from configure import configure_kr_ocr_model, configure_ocr_model
 from package_common import (
     COPY_IGNORE, copy_project_files, copy_tree, remove_build_artifacts, require_file,
 )
@@ -53,6 +53,9 @@ def install_resource(working_dir: Path, install_path: Path) -> None:
     )
     configure_ocr_model(
         working_dir / "assets", install_path / "resource" / "base" / "model" / "ocr"
+    )
+    configure_kr_ocr_model(
+        working_dir / "assets", install_path / "resource" / "kr" / "model" / "ocr"
     )
     copy_tree(
         working_dir / "assets" / "interface",

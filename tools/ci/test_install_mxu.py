@@ -116,7 +116,9 @@ class InstallMxuTests(unittest.TestCase):
             encoding="utf-8"
         )
 
-        with patch.object(install_mxu, "configure_ocr_model"):
+        with patch.object(install_mxu, "configure_ocr_model"), patch.object(
+            install_mxu, "configure_kr_ocr_model"
+        ):
             output = install_mxu.build_package("v1.2.3", working_dir=self.root)
 
         interface = install_mxu.validate_package(output)
@@ -161,7 +163,9 @@ class InstallMxuTests(unittest.TestCase):
         )
 
     def test_validation_rejects_missing_interface_path(self) -> None:
-        with patch.object(install_mxu, "configure_ocr_model"):
+        with patch.object(install_mxu, "configure_ocr_model"), patch.object(
+            install_mxu, "configure_kr_ocr_model"
+        ):
             output = install_mxu.build_package("v1.2.3", working_dir=self.root)
         (output / "interface" / "tasks" / "login.json").unlink()
 
@@ -171,7 +175,9 @@ class InstallMxuTests(unittest.TestCase):
     def test_rejects_dirty_or_unsafe_staging(self) -> None:
         self._write(self.install_dir / "unexpected.txt")
         with self.assertRaisesRegex(ValueError, "fresh staging directory"):
-            with patch.object(install_mxu, "configure_ocr_model"):
+            with patch.object(install_mxu, "configure_ocr_model"), patch.object(
+                install_mxu, "configure_kr_ocr_model"
+            ):
                 install_mxu.build_package("v1.2.3", working_dir=self.root)
 
         with self.assertRaisesRegex(ValueError, "strict child"):
@@ -203,6 +209,7 @@ class InstallMxuTests(unittest.TestCase):
                 ["resource/base", "resource/tw"],
                 ["resource/base", "resource/en"],
                 ["resource/base", "resource/jp"],
+                ["resource/base", "resource/kr"],
             ],
         )
         self.assertEqual(
