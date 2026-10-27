@@ -368,6 +368,7 @@ jobs:
                   "resource/kr/model/ocr/det.onnx",
                   "resource/kr/model/ocr/rec.onnx",
                   "resource/kr/model/ocr/keys.txt",
+                  "resource/kr/model/ocr/LICENSE",
               }
               missing_ocr_files = required_ocr_files - pi_names
               if missing_ocr_files:

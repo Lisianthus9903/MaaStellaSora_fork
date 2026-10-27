@@ -41,7 +41,7 @@ def configure_kr_ocr_model(
     """韩服 OCR：沿用通用 v6 检测模型，识别模型与字典使用韩文 PP-OCRv5（v6 不支持韩文）。"""
     ocr_dir = ocr_dir or assets_dir / "resource" / "kr" / "model" / "ocr"
     if ocr_dir.exists():
-        for name in REQUIRED_OCR_FILES:
+        for name in KR_OCR_SOURCES:
             require_file(ocr_dir / name)
         print("Found existing KR OCR directory, skipping KR OCR model import.")
         return
