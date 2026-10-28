@@ -6,7 +6,7 @@ from maa.context import Context
 from maa.define import Rect
 
 from utils import logger as logger_module
-logger = logger_module.get_logger("operation")
+logger = logger_module.get_logger(__name__)
 
 
 RESOURCE_RECOGNITION_NODE = "猎影合围_识别资源数量"

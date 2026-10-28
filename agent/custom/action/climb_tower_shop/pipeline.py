@@ -8,7 +8,7 @@ from .context import ShopContext, Item, Melody
 from .pipeline_buyer import buy_general, buy_assist_melody
 
 from utils import logger as logger_module
-logger = logger_module.get_logger("climb_tower_shop_pipeline")
+logger = logger_module.get_logger(__name__)
 
 
 SortFunc = Callable[[list[Item]], list[Item]]

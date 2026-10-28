@@ -4,7 +4,7 @@ from maa.context import Context
 from maa.define import OCRResult, BoxAndScoreResult
 
 from utils import logger as logger_module
-logger = logger_module.get_logger("climb_tower_record_scan")
+logger = logger_module.get_logger(__name__)
 
 # 运行时数值与目标配置的汇合节点（同时也是 loop_count 的载体）
 LOOP_NODE = "星塔_循环用节点_agent"

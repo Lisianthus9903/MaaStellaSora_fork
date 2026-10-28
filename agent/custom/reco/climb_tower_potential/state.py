@@ -10,7 +10,7 @@ from .context import MAX_POTENTIAL_LEVEL, PotentialContext, Potential, Trekker
 
 from utils import logger as logger_module
 from utils.dev_config import DRAW_DATA_SAVE_ENABLED
-logger = logger_module.get_logger("climb_tower_potential_state")
+logger = logger_module.get_logger(__name__)
 
 
 @dataclass(slots=True)

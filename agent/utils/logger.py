@@ -13,12 +13,13 @@
 """
 
 import logging
+import os
 from datetime import datetime
 from pathlib import Path
 
 
-class UIPureTextFormatter(logging.Formatter):
-    """自定义格式化器：将日志级别转换为小写"""
+class LowerLevelNameFormatter(logging.Formatter):
+    """自定义格式化器：将日志级别转换为小写，以适配MFAAvalonia格式"""
 
     def format(self, record: logging.LogRecord) -> str:
         # 保存原始级别名称
@@ -32,15 +33,19 @@ class UIPureTextFormatter(logging.Formatter):
         return result
 
 
-# 用于追踪已初始化的logger
-_initialized_loggers: set[str] = set()
-
-# 全局调试模式状态及日志文件路径，确保后续新建logger也能感知
-_debug_mode_enabled: bool = False
-_debug_log_file: Path | None = None
+class _ConsoleHandler(logging.StreamHandler):
+    pass
 
 
-def get_logger(name: str = "my_app") -> logging.Logger:
+class _FileHandler(logging.FileHandler):
+    pass
+
+
+_CUSTOM_LOGGER_NAME = "custom"
+_custom_logger_initialized = False
+
+
+def get_logger(name: str = "custom") -> logging.Logger:
     """
     获取或创建一个Logger实例
 
@@ -50,136 +55,99 @@ def get_logger(name: str = "my_app") -> logging.Logger:
     Returns:
         Logger实例
 
-    Examples:
-        >>> logger = get_logger(__name__)
-        >>> logger.info("应用启动")
+    custom 命名空间的日志通过父 logger 统一输出；控制台默认显示 INFO 及以上，
+    文件始终记录 DEBUG 及以上。debug_mode() 会让控制台也显示 DEBUG。
     """
+    if name == _CUSTOM_LOGGER_NAME or name.startswith(f"{_CUSTOM_LOGGER_NAME}."):
+        _configure_custom_logger()
+        return logging.getLogger(name)
+
     logger = logging.getLogger(name)
-
-    # 避免重复初始化
-    if name not in _initialized_loggers:
-        # 设置 logger 级别为 DEBUG，由 handler 控制实际输出级别
+    if not any(isinstance(handler, _ConsoleHandler) for handler in logger.handlers):
         logger.setLevel(logging.DEBUG)
-
-        # 创建控制台handler
-        console_handler = logging.StreamHandler()
-        # handler 默认级别为 INFO
-        console_handler.setLevel(logging.INFO)
-
-        # 设置格式化器：严格遵循 levelname:message 格式
-        fmt = "%(levelname)s:%(message)s"
-        formatter = UIPureTextFormatter(fmt)
-        console_handler.setFormatter(formatter)
-
-        # 添加handler
-        logger.addHandler(console_handler)
-
-        # 标记为已初始化
-        _initialized_loggers.add(name)
-
-        # 修复：若调试模式已开启，新建logger也应立即应用
-        if _debug_mode_enabled and _debug_log_file:
-            _apply_debug_to_logger(logger, _debug_log_file)
-
+        _add_console_handler(logger)
+    if not any(isinstance(handler, _FileHandler) for handler in logger.handlers):
+        _add_file_handler(logger)
+    logger.propagate = False
     return logger
 
 
-def _apply_debug_to_logger(logger: logging.Logger, log_file: Path) -> None:
-    """
-    对单个logger应用调试模式：添加独立的文件处理器并将所有handler级别设为DEBUG。
+def _add_console_handler(logger: logging.Logger) -> None:
+    handler = _ConsoleHandler()
+    handler.setLevel(logging.INFO)
+    handler.setFormatter(LowerLevelNameFormatter("%(levelname)s:%(message)s"))
+    logger.addHandler(handler)
 
-    修复：为每个logger创建独立的FileHandler实例，避免多logger共享同一
-    handler导致的重复写入问题。
 
-    Args:
-        logger:   目标logger实例
-        log_file: 日志文件的完整路径
-    """
-    # 检查是否已经添加了文件处理器（避免重复添加）
-    has_file_handler = any(isinstance(h, logging.FileHandler) for h in logger.handlers)
-    if not has_file_handler:
-        # 修复：每个logger使用独立的FileHandler实例
-        file_handler = logging.FileHandler(str(log_file), encoding="utf-8")
-        file_handler.setLevel(logging.DEBUG)
+def _add_file_handler(logger: logging.Logger) -> None:
+    if any(isinstance(handler, _FileHandler) for handler in logger.handlers):
+        return
 
-        file_fmt = "%(asctime)s|%(name)s|%(levelname)s|%(message)s"
-        file_formatter = logging.Formatter(file_fmt, datefmt="%Y-%m-%d %H:%M:%S")
-        file_handler.setFormatter(file_formatter)
+    log_dir = Path(__file__).resolve().parents[2] / "debug" / "agent"
+    log_dir.mkdir(parents=True, exist_ok=True)
+    log_file = log_dir / f"{datetime.now().strftime('%Y-%m-%d')}.log"
 
-        logger.addHandler(file_handler)
+    handler = _FileHandler(log_file, encoding="utf-8")
+    handler.setFormatter(
+        logging.Formatter(
+            "[%(asctime)s]%(levelname)s|%(name)s|%(message)s",
+            datefmt="%Y-%m-%d %H:%M:%S",
+        )
+    )
+    logger.addHandler(handler)
 
-    # 将所有handler（含控制台）级别设为DEBUG
-    for handler in logger.handlers:
-        handler.setLevel(logging.DEBUG)
 
+def _configure_custom_logger() -> logging.Logger:
+    global _custom_logger_initialized
+
+    logger = logging.getLogger(_CUSTOM_LOGGER_NAME)
+    if not _custom_logger_initialized:
+        logger.setLevel(logging.DEBUG)
+        _custom_logger_initialized = True
+    if not any(isinstance(handler, _ConsoleHandler) for handler in logger.handlers):
+        _add_console_handler(logger)
+    if not any(isinstance(handler, _FileHandler) for handler in logger.handlers):
+        _add_file_handler(logger)
+    return logger
 
 
 def debug_mode() -> None:
-    """
-    开启调试模式：
-    - 将所有已创建logger的handler级别设置为DEBUG
-    - 为每个logger添加独立的文件处理器，将日志保存到 debug/agent/{年-月-日}.log
-    - 记录全局状态，确保之后新建的logger也自动应用调试模式
-    """
-    global _debug_mode_enabled, _debug_log_file
-
-    # 基于文件自身位置推算项目根目录（/agent/utils/logger.py -> 上两级）
-    log_dir = Path(__file__).resolve().parents[2] / "debug" / "agent"
-    log_dir.mkdir(parents=True, exist_ok=True)
-
-    log_file = log_dir / f"{datetime.now().strftime('%Y-%m-%d')}.log"
-
-    # 记录全局状态，供后续 get_logger() 使用
-    _debug_mode_enabled = True
-    _debug_log_file = log_file
-
-    # 对所有已初始化的logger应用调试模式
-    for logger_name in _initialized_loggers:
-        logger = logging.getLogger(logger_name)
-        _apply_debug_to_logger(logger, log_file)
-
-    logger = get_logger(__name__)
-    logger.debug(f"Debug mode enabled. Log file: {log_file}")
+    """开启 custom 命名空间的控制台 DEBUG 日志。"""
+    logger = _configure_custom_logger()
+    for handler in logger.handlers:
+        if isinstance(handler, _ConsoleHandler):
+            handler.setLevel(logging.DEBUG)
+            break
+    else:
+        raise RuntimeError("custom logger has no console handler")
 
 
 def set_log_level(level: int) -> None:
-    """
-    设置所有logger及其handler的日志级别
-
-    修复：同步更新logger自身的level，保证logger与handler级别一致。
-
-    Args:
-        level: 日志级别（如 logging.INFO, logging.DEBUG 等）
-    """
-    for logger_name in _initialized_loggers:
-        logger = logging.getLogger(logger_name)
-        # 修复：同步更新logger本身的level
-        logger.setLevel(level)
-        for handler in logger.handlers:
-            handler.setLevel(level)
+    """设置 custom 命名空间的日志级别。"""
+    _configure_custom_logger().setLevel(level)
 
 
 if __name__ == "__main__":
-    # 测试代码
-    logger = get_logger(__name__)
+    logger = get_logger("custom.example")
+    logger.info(f"当前语言: {lang}")
 
     logger.debug("这条debug不会显示")
     logger.info("这是一条信息")
     logger.warning("这是一条警告")
     logger.error("这是一条错误")
 
-    print("\n--- 开启调试模式 ---")
+    logger.info("--- 开启调试模式 ---")
     debug_mode()
 
     logger.debug("现在debug可以显示了")
     logger.info("调试模式下的信息")
 
-    print("\n--- 测试不同的logger ---")
-    logger2 = get_logger("module2")
+    logger.info("--- 测试不同的custom logger ---")
+    logger2 = get_logger("custom.module2")
     logger2.debug("来自module2的debug消息")
     logger2.info("来自module2的info消息")
 
-    print("\n--- 测试调试模式后新建的logger ---")
-    logger3 = get_logger("module3")
+    logger.info("--- 测试调试模式后新建的custom logger ---")
+    logger3 = get_logger("custom.module3")
     logger3.debug("module3在debug_mode()之后创建，debug消息也应正常显示")
-    logger3.info("module3的info消息")
+    logger3.info("module3在debug_mode()之后创建")

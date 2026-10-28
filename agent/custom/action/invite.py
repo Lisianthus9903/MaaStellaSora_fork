@@ -11,7 +11,7 @@ class InviteAuto(CustomAction):
     def __init__(self):
         # 导入logger
         super().__init__()
-        self.logger = logger.get_logger()
+        self.logger = logger.get_logger(__name__)
 
     def run(
             self,

@@ -11,7 +11,7 @@ from .handler_default import ChoosePotentialHandler
 from utils.dev_config import DRAW_DATA_SAVE_ENABLED
 
 from utils import logger as logger_module
-logger = logger_module.get_logger("climb_tower_potential_preset")
+logger = logger_module.get_logger(__name__)
 
 
 class RecommendationHandler(ChoosePotentialHandler):

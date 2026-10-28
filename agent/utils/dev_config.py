@@ -1,7 +1,7 @@
 import json
 from pathlib import Path
 from utils import logger as logger_module
-logger = logger_module.get_logger("dev_config")
+logger = logger_module.get_logger(__name__)
 
 
 config_path = Path(__file__).resolve().parents[1] / "agent_config" / "dev_config.json"

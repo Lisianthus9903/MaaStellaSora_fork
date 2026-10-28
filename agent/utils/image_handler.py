@@ -24,7 +24,7 @@ from pathlib import Path
 import numpy as np
 
 from utils import logger as logger_module
-logger = logger_module.get_logger("utils_image_handler")
+logger = logger_module.get_logger(__name__)
 
 save_dir = Path(__file__).resolve().parents[2] / "debug" / "agent_image"
 save_dir.mkdir(parents=True, exist_ok=True)

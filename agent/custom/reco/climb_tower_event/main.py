@@ -11,7 +11,7 @@ from .custom_rules import CUSTOM_RULE_REGISTRY
 from utils import logger as logger_module
 from utils.dev_config import DEV_IMAGES_SAVE_ENABLED
 
-logger = logger_module.get_logger("climb_tower_event")
+logger = logger_module.get_logger(__name__)
 
 
 def _match_regex(actual: str, pattern: str | list | tuple | None) -> bool:

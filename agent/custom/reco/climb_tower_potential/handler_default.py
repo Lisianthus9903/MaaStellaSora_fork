@@ -6,7 +6,7 @@ from .interactor import PotentialInteractor
 from .state import State, Trekker, OwnedPotentials, OwnedPotential
 
 from utils import logger as logger_module
-logger = logger_module.get_logger("climb_tower_potential_default")
+logger = logger_module.get_logger(__name__)
 
 
 class ChoosePotentialHandler:

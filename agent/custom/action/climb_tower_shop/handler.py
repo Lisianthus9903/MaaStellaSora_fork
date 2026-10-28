@@ -10,7 +10,7 @@ from .interactor import ShopInteractor
 from custom.action.climb_tower_melody_scan import auto_scan_melody_counts
 from custom.reco.climb_tower_potential.state import State
 from utils import logger as logger_module
-logger = logger_module.get_logger("climb_tower_shop_handler")
+logger = logger_module.get_logger(__name__)
 
 class ShopHandler:
     strategies = [

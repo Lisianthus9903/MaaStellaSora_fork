@@ -13,7 +13,7 @@ from custom.reco.climb_tower_potential.state import State
 
 from utils import logger as logger_module
 
-logger = logger_module.get_logger("climb_tower_preparation")
+logger = logger_module.get_logger(__name__)
 
 
 @AgentServer.custom_action("ascension_preparation")

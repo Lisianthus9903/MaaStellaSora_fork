@@ -7,7 +7,7 @@ if TYPE_CHECKING:
 from .context import Item
 
 from utils import logger as logger_module
-logger = logger_module.get_logger("climb_tower_shop_pipeline_buyer")
+logger = logger_module.get_logger(__name__)
 
 
 def buy_general(item: Item, handler: ShopHandler) -> bool:
@@ -164,4 +164,3 @@ def _is_assist_skill_unlocked(handler: ShopHandler) -> bool:
         logger.warning("未能解析到协奏音符文本，默认按已解锁处理")
 
     return True
-

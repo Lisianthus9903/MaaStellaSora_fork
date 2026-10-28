@@ -7,7 +7,7 @@ from .interactor import PotentialInteractor
 from .handler_default import ChoosePotentialHandler
 
 from utils import logger as logger_module
-logger = logger_module.get_logger("climb_tower_potential_json")
+logger = logger_module.get_logger(__name__)
 
 
 class AssistantPriorityHandler(ChoosePotentialHandler):

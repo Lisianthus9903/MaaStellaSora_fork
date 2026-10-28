@@ -6,7 +6,7 @@ from collections.abc import Iterator, ItemsView, ValuesView
 from typing import Any, TYPE_CHECKING
 
 from utils import logger as logger_module
-logger = logger_module.get_logger("climb_tower_shop_context")
+logger = logger_module.get_logger(__name__)
 
 ITEM_ROIS = [
     {
@@ -556,4 +556,3 @@ class Item:
             return self.price / std
 
         return 1.0
-

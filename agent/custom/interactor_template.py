@@ -10,7 +10,7 @@ from maa.context import Context
 from maa.define import OCRResult, TemplateMatchResult, ColorMatchResult
 
 from utils import logger as logger_module
-logger = logger_module.get_logger("climb_tower_interactor")
+logger = logger_module.get_logger(__name__)
 
 
 class Interactor:

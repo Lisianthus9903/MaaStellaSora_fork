@@ -3,7 +3,7 @@ from maa.context import Context
 
 from custom.interactor_template import Interactor
 from utils import logger as logger_module
-logger = logger_module.get_logger("climb_tower_potential_interactor")
+logger = logger_module.get_logger(__name__)
 
 
 class PotentialInteractor(Interactor):

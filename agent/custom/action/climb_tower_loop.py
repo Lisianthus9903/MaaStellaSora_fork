@@ -4,7 +4,7 @@ from maa.context import Context
 
 from custom.reco.climb_tower_potential.state import State
 from utils import logger as logger_module
-logger = logger_module.get_logger("climb_tower_loop")
+logger = logger_module.get_logger(__name__)
 
 HOME_NODE = "通用_返回主页"
 HOME_NODE_ON = {HOME_NODE: {"enabled": True}}

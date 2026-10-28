@@ -9,7 +9,7 @@ from .handler_preset import RecommendationHandler
 from .handler_json import AssistantPriorityHandler
 
 from utils import logger as logger_module
-logger = logger_module.get_logger("climb_tower_potential")
+logger = logger_module.get_logger(__name__)
 
 
 @AgentServer.custom_recognition("choose_potential_recognition")

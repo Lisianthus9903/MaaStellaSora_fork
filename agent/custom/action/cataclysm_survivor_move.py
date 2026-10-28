@@ -20,7 +20,7 @@ from maa.custom_action import CustomAction
 from utils import logger as logger_module
 from utils.cataclysm_survivor import IO_TIMEOUT, grab as _grab, wait_job
 
-logger = logger_module.get_logger("cataclysm_survivor")
+logger = logger_module.get_logger(__name__)
 
 ## Win32 虚拟键码
 KEY_W = 0x57

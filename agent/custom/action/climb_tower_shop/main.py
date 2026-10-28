@@ -7,7 +7,7 @@ from .handler import ShopHandler
 from .context import ShopContext, ShopParams
 
 from utils import logger as logger_module
-logger = logger_module.get_logger("climb_tower_shop")
+logger = logger_module.get_logger(__name__)
 
 
 @AgentServer.custom_action("shop_action")

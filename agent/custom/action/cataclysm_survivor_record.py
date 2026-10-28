@@ -15,7 +15,7 @@ from maa.custom_action import CustomAction
 from utils import logger as logger_module
 from utils.cataclysm_survivor import grab as _grab, wait_job
 
-logger = logger_module.get_logger("cataclysm_survivor")
+logger = logger_module.get_logger(__name__)
 
 ## 记录卡区域相对「◈ 旅人」徽标的偏移（x, y, w, h）
 CARD_OFFSET = (-20, -71, 230, 250)

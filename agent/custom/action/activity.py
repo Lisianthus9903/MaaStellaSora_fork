@@ -7,7 +7,7 @@ from maa.custom_action import CustomAction
 from utils import logger as logger_module
 
 
-logger = logger_module.get_logger("activity_challenge")
+logger = logger_module.get_logger(__name__)
 
 
 @AgentServer.custom_action("activity_challenge_random_stage")
