@@ -142,7 +142,7 @@ def _add_file_handler(logger: logging.Logger) -> None:
     handler.addFilter(I18nFilter())
     handler.setFormatter(
         logging.Formatter(
-            "[%(asctime)s]%(levelname)s|%(name)s|%(i18n_key)s|%(message)s",
+            "%(asctime)s|%(levelname)s|%(name)s|%(i18n_key)s|%(message)s",
             datefmt="%Y-%m-%d %H:%M:%S",
         )
     )
