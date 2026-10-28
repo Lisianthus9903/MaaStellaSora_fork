@@ -16,6 +16,7 @@ class PipelineI18nTests(unittest.TestCase):
         (self.root / "assets" / "interface" / "tasks").mkdir(parents=True)
         (self.root / "assets" / "resource" / "base").mkdir(parents=True)
         (self.root / "assets" / "i18n").mkdir(parents=True)
+        (self.root / "agent" / "agent_config" / "i18n").mkdir(parents=True)
 
         self.interface = {
             "languages": {"zh_cn": "i18n/zh_cn.json"},
@@ -52,6 +53,7 @@ class PipelineI18nTests(unittest.TestCase):
         self._write_json("assets/interface/tasks/tasks.json", self.task)
         self._write_json("assets/resource/base/pipeline.json", self.pipeline)
         self._write_json("assets/i18n/zh_cn.json", self.translations)
+        self._write_json("agent/agent_config/i18n/zh_cn.json", {})
 
     def tearDown(self):
         self.temp_dir.cleanup()
@@ -107,6 +109,52 @@ class PipelineI18nTests(unittest.TestCase):
                 self.skipTest(f"directory symlinks are unavailable: {error}")
 
             self.assertEqual(check(alias), [])
+
+    def _write_agent_fixture(self, source, translations):
+        source_path = self.root / "agent" / "custom" / "example.py"
+        source_path.parent.mkdir(parents=True, exist_ok=True)
+        source_path.write_text(source, encoding="utf-8")
+        self._write_json("agent/agent_config/i18n/zh_cn.json", translations)
+
+    def test_scans_agent_log_keys_and_ignores_debug(self):
+        self._write_agent_fixture(
+            """
+logger.info("$agent.example.ready")
+logger.warning("$agent.example.warning")
+self._handle_fatal_error(context, "$agent.example.failed")
+logger.debug("未处理的 Debug 文案")
+""",
+            {
+                "agent.example.ready": "已就绪",
+                "agent.example.warning": "注意",
+                "agent.example.failed": "失败",
+            },
+        )
+
+        self.assertEqual(check(self.root), [])
+
+    def test_reports_hardcoded_agent_log_and_translation_coverage(self):
+        self._write_agent_fixture(
+            """
+logger.info("硬编码日志")
+logger.error("$agent.example.missing")
+""",
+            {
+                "agent.example.unused": "未使用",
+            },
+        )
+
+        messages = [item.message for item in check(self.root)]
+
+        self.assertIn("hardcoded Chinese in an Agent info/warning/error log", messages)
+        self.assertIn(
+            "missing translation for locale zh_cn: agent.example.missing",
+            messages,
+        )
+        self.assertIn(
+            "unused translation for locale zh_cn: agent.example.unused",
+            messages,
+        )
 
 
 if __name__ == "__main__":

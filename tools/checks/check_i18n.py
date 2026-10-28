@@ -1,4 +1,5 @@
 import argparse
+import ast
 import json
 import re
 import sys
@@ -330,10 +331,101 @@ class PipelineScope:
         return result
 
 
+class AgentScope:
+    name = "agent"
+
+    def scan(self, root: Path, interface: dict[str, Any]) -> ScanResult:
+        result = ScanResult()
+        agent_root = root / "agent"
+        for path in sorted(agent_root.rglob("*.py")):
+            if path == agent_root / "utils" / "logger.py":
+                continue
+            location = path.relative_to(root).as_posix()
+            try:
+                source = path.read_text(encoding="utf-8")
+                tree = ast.parse(source, filename=location)
+            except (OSError, UnicodeError, SyntaxError) as error:
+                result.findings.append(Finding(f"cannot read Python source: {error}", location))
+                continue
+
+            for node in ast.walk(tree):
+                if not isinstance(node, ast.Call):
+                    continue
+                if self._is_logger_call(node):
+                    self._scan_log_call(node, location, result)
+                elif self._is_fatal_error_helper(node):
+                    for argument in node.args:
+                        for item in ast.walk(argument):
+                            if isinstance(item, ast.Constant) and isinstance(item.value, str):
+                                self._collect_key(item.value, location, item, result)
+        return result
+
+    @staticmethod
+    def _is_logger_call(node: ast.Call) -> bool:
+        if not isinstance(node.func, ast.Attribute) or node.func.attr not in {
+            "info",
+            "warning",
+            "error",
+        }:
+            return False
+        receiver = node.func.value
+        return (isinstance(receiver, ast.Name) and receiver.id == "logger") or (
+            isinstance(receiver, ast.Attribute) and receiver.attr == "logger"
+        )
+
+    @staticmethod
+    def _is_fatal_error_helper(node: ast.Call) -> bool:
+        return isinstance(node.func, ast.Attribute) and node.func.attr == "_handle_fatal_error"
+
+    def _scan_log_call(self, node: ast.Call, location: str, result: ScanResult) -> None:
+        if not node.args:
+            return
+        message = node.args[0]
+        if isinstance(message, ast.Constant) and isinstance(message.value, str):
+            if self._collect_key(message.value, location, message, result):
+                return
+            text = message.value
+        elif isinstance(message, ast.JoinedStr):
+            parts = []
+            for item in message.values:
+                if isinstance(item, ast.Constant) and isinstance(item.value, str):
+                    parts.append(item.value)
+            text = "".join(parts)
+        else:
+            return
+
+        if CHINESE_TEXT.search(text):
+            result.findings.append(
+                Finding(
+                    "hardcoded Chinese in an Agent info/warning/error log",
+                    self._node_location(location, message),
+                )
+            )
+
+    @staticmethod
+    def _collect_key(value: str, location: str, node: ast.AST, result: ScanResult) -> bool:
+        if not value.startswith("$agent."):
+            return False
+        key = value[1:]
+        if key == "agent.":
+            result.findings.append(
+                Finding("empty i18n key", AgentScope._node_location(location, node))
+            )
+        else:
+            result.add_reference(key, AgentScope._node_location(location, node))
+        return True
+
+    @staticmethod
+    def _node_location(location: str, node: ast.AST) -> str:
+        line = getattr(node, "lineno", None)
+        return f"{location}:{line}" if isinstance(line, int) else location
+
+
 CHECK_SCOPES: tuple[CheckScope, ...] = (
     InterfaceScope(),
     PipelineOverrideScope(),
     PipelineScope(),
+    AgentScope(),
 )
 
 
@@ -361,23 +453,75 @@ def load_translations(
         if not path.is_relative_to(interface_dir):
             findings.append(Finding("translation path escapes the assets directory", location))
             continue
-        try:
-            data = load_json(path)
-        except (OSError, UnicodeError, json.JSONDecodeError, DuplicateKeyError) as error:
-            findings.append(Finding(f"cannot read translation file: {error}", location))
-            continue
-        if not isinstance(data, dict):
-            findings.append(Finding("translation file must contain a flat JSON object", str(path)))
-            continue
-
-        invalid = [key for key, value in data.items() if not isinstance(value, str)]
-        if invalid:
-            findings.append(
-                Finding(f"translation values must be strings: {', '.join(invalid)}", str(path))
-            )
-            continue
-        translations[locale] = data
+        data, finding = load_translation_file(path, location)
+        if finding:
+            findings.append(finding)
+        else:
+            translations[locale] = data
     return translations, findings
+
+
+def load_translation_file(path: Path, location: str) -> tuple[dict[str, str], Finding | None]:
+    try:
+        data = load_json(path)
+    except (OSError, UnicodeError, json.JSONDecodeError, DuplicateKeyError) as error:
+        return {}, Finding(f"cannot read translation file: {error}", location)
+    if not isinstance(data, dict):
+        return {}, Finding("translation file must contain a flat JSON object", location)
+
+    invalid = [key for key, value in data.items() if not isinstance(value, str)]
+    if invalid:
+        return {}, Finding(f"translation values must be strings: {', '.join(invalid)}", location)
+    return data, None
+
+
+def load_agent_translations(root: Path) -> tuple[dict[str, dict[str, str]], list[Finding]]:
+    translations = {}
+    findings = []
+    i18n_root = root / "agent" / "agent_config" / "i18n"
+    if not i18n_root.is_dir():
+        return {}, [
+            Finding("Agent i18n directory must contain zh_cn.json", str(i18n_root))
+        ]
+
+    for path in sorted(i18n_root.glob("*.json")):
+        locale = path.stem
+        data, finding = load_translation_file(path, str(path))
+        if finding:
+            findings.append(finding)
+        else:
+            translations[locale] = data
+    if "zh_cn" not in translations:
+        findings.append(
+            Finding("Agent i18n directory must contain zh_cn.json", str(i18n_root))
+        )
+    return translations, findings
+
+
+def check_translation_coverage(
+    references: dict[str, list[str]],
+    translations: dict[str, dict[str, str]],
+    location_root: str = "languages",
+) -> list[Finding]:
+    findings = []
+    for locale, entries in translations.items():
+        missing = references.keys() - entries.keys()
+        unused = entries.keys() - references.keys()
+        for key in sorted(missing):
+            findings.append(
+                Finding(
+                    f"missing translation for locale {locale}: {key}",
+                    ", ".join(references[key]),
+                )
+            )
+        for key in sorted(unused):
+            findings.append(
+                Finding(
+                    f"unused translation for locale {locale}: {key}",
+                    f"{location_root}.{locale}",
+                )
+            )
+    return findings
 
 
 def check(root: Path) -> list[Finding]:
@@ -391,28 +535,27 @@ def check(root: Path) -> list[Finding]:
         return [Finding("interface.json must contain a JSON object", str(interface_path))]
 
     result = ScanResult()
+    agent_result = ScanResult()
     for scope in CHECK_SCOPES:
         scoped = scope.scan(root, interface)
+        target = agent_result if scope.name == "agent" else result
         for key, locations in scoped.references.items():
-            result.references.setdefault(key, []).extend(locations)
+            target.references.setdefault(key, []).extend(locations)
         result.findings.extend(scoped.findings)
 
     translations, translation_findings = load_translations(root, interface)
     result.findings.extend(translation_findings)
-    for locale, entries in translations.items():
-        missing = result.references.keys() - entries.keys()
-        unused = entries.keys() - result.references.keys()
-        for key in sorted(missing):
-            result.findings.append(
-                Finding(
-                    f"missing translation for locale {locale}: {key}",
-                    ", ".join(result.references[key]),
-                )
-            )
-        for key in sorted(unused):
-            result.findings.append(
-                Finding(f"unused translation for locale {locale}: {key}", f"languages.{locale}")
-            )
+    result.findings.extend(check_translation_coverage(result.references, translations))
+
+    agent_translations, agent_translation_findings = load_agent_translations(root)
+    result.findings.extend(agent_translation_findings)
+    result.findings.extend(
+        check_translation_coverage(
+            agent_result.references,
+            agent_translations,
+            "agent/agent_config/i18n",
+        )
+    )
     return result.findings
 
 
