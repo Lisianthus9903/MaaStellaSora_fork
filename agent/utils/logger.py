@@ -12,10 +12,56 @@
     logger.debug("这是调试信息")
 """
 
+import json
 import logging
 import os
+from collections.abc import Mapping
 from datetime import datetime
 from pathlib import Path
+
+
+def _read_translations(language: str) -> dict[str, str] | None:
+    translation_file = Path(__file__).resolve().parents[1] / "agent_config" / "i18n" / f"{language}.json"
+    try:
+        translations = json.loads(translation_file.read_text(encoding="utf-8"))
+    except (OSError, UnicodeError, json.JSONDecodeError):
+        return None
+
+    if isinstance(translations, dict) and all(
+        isinstance(key, str) and isinstance(value, str) for key, value in translations.items()
+    ):
+        return translations
+    return None
+
+
+def _load_translations() -> dict[str, str]:
+    translations = _read_translations("zh_cn") or {}
+    if lang and lang != "zh_cn":
+        translations.update(_read_translations(lang) or {})
+    return translations
+
+
+class I18nFilter(logging.Filter):
+    """Translate messages written as $key and interpolate {variables}."""
+
+    def filter(self, record: logging.LogRecord) -> bool:
+        if getattr(record, "_i18n_processed", False):
+            return True
+        record._i18n_processed = True
+
+        if not isinstance(record.msg, str) or not record.msg.startswith("$"):
+            return True
+
+        translation = _TRANSLATIONS.get(record.msg[1:])
+        if translation is None:
+            if isinstance(record.args, Mapping):
+                record.args = ()
+            return True
+
+        variables = record.args if isinstance(record.args, Mapping) else {}
+        record.msg = translation.format_map(variables)
+        record.args = ()
+        return True
 
 
 class LowerLevelNameFormatter(logging.Formatter):
@@ -43,6 +89,8 @@ class _FileHandler(logging.FileHandler):
 
 _CUSTOM_LOGGER_NAME = "custom"
 _custom_logger_initialized = False
+lang = os.environ.get("PI_CLIENT_LANGUAGE", "")
+_TRANSLATIONS = _load_translations()
 
 
 def get_logger(name: str = "custom") -> logging.Logger:
@@ -76,6 +124,7 @@ def _add_console_handler(logger: logging.Logger) -> None:
     handler = _ConsoleHandler()
     handler.setLevel(logging.INFO)
     handler.setFormatter(LowerLevelNameFormatter("%(levelname)s:%(message)s"))
+    handler.addFilter(I18nFilter())
     logger.addHandler(handler)
 
 
@@ -88,6 +137,7 @@ def _add_file_handler(logger: logging.Logger) -> None:
     log_file = log_dir / f"{datetime.now().strftime('%Y-%m-%d')}.log"
 
     handler = _FileHandler(log_file, encoding="utf-8")
+    handler.addFilter(I18nFilter())
     handler.setFormatter(
         logging.Formatter(
             "[%(asctime)s]%(levelname)s|%(name)s|%(message)s",
@@ -128,8 +178,10 @@ def set_log_level(level: int) -> None:
 
 
 if __name__ == "__main__":
+    _TRANSLATIONS["test.greeting"] = "Hello, {name}!"
     logger = get_logger("custom.example")
     logger.info(f"当前语言: {lang}")
+    logger.info("$test.greeting", {"name": "MaaStellaSora"})
 
     logger.debug("这条debug不会显示")
     logger.info("这是一条信息")
@@ -140,6 +192,7 @@ if __name__ == "__main__":
     debug_mode()
 
     logger.debug("现在debug可以显示了")
+    logger.debug("$test.greeting", {"name": "MaaStellaSora"})
     logger.info("调试模式下的信息")
 
     logger.info("--- 测试不同的custom logger ---")
