@@ -51,9 +51,19 @@ class RecordScanAction(CustomAction):
             f"潜能数={attach['potential_count']}（分项 {parts}）"
         )
         if attach["record_level"] == UNKNOWN:
-            logger.error(f"纪录等级识别失败：{level}")
+            logger.error(
+                "$agent.custom.action.climb_tower_record_scan.run.recognition_failed",
+                {
+                    "level": level,
+                },
+            )
         if attach["potential_count"] == UNKNOWN:
-            logger.error(f"纪录潜能数识别失败：{parts}")
+            logger.error(
+                "$agent.custom.action.climb_tower_record_scan.run.potential_recognition_failed",
+                {
+                    "parts": parts,
+                },
+            )
         return True
 
     @staticmethod
@@ -76,21 +86,39 @@ class RecordScanAction(CustomAction):
         """使用 pipeline 节点识别潜能数，先定位记录潜能数量的位置，然后根据位置偏移分别读取潜能数量（失败为空列表）。"""
         location_detail = context.run_recognition(location_node, image)
         if not (location_detail and location_detail.hit):
-            logger.error("定位潜能数量位置失败")
+            logger.error(
+                "$agent.custom.action.climb_tower_record_scan._read_potential_counts.potential_count_location_failed"
+            )
             return []
         if len(location_detail.filtered_results) != 3:
-            logger.error(f"识别潜能数的旅人数量有误，预期为3个，实际为{len(location_detail.filtered_results)}个")
+            logger.error(
+                "$agent.custom.action.climb_tower_record_scan._read_potential_counts.recognition_failed",
+                {
+                    "count": len(location_detail.filtered_results),
+                },
+            )
             return []
 
         counts = []
         for i, r in enumerate(location_detail.filtered_results):
             if not isinstance(r, BoxAndScoreResult):
-                logger.error(f"第{i+1}个旅人的潜能数量位置结果 {r} 不是 BoxAndScoreResult 类型。如你没有修改过代码，请联系开发人员。")
+                logger.error(
+                    "$agent.custom.action.climb_tower_record_scan._read_potential_counts.invalid_result_type",
+                    {
+                        "value": i+1,
+                        "r": r,
+                    },
+                )
                 return []
             pipeline_override = {recognition_node: {"recognition": {"param": {"roi": r.box}}}}
             reco_result = context.run_recognition(recognition_node, image, pipeline_override)
             if not (reco_result and reco_result.hit and isinstance(reco_result.best_result, OCRResult)):
-                logger.error(f"第{i+1}个旅人的潜能数量识别失败")
+                logger.error(
+                    "$agent.custom.action.climb_tower_record_scan._read_potential_counts.potential_count_recognition_failed",
+                    {
+                        "value": i+1,
+                    },
+                )
                 return []
             counts.append(int(reco_result.best_result.text))
         return counts

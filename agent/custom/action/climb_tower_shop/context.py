@@ -424,7 +424,9 @@ class ShopContext:
         if prices:
             return int(min(prices))
         else:
-            logger.error("无法计算理论最低可购买商品价格，本错误将导致无法执行刷新")
+            logger.error(
+                "$agent.custom.action.climb_tower_shop.context.min_buyable_price.minimum_purchase_price_unavailable"
+            )
             return 65535
 
     @property
@@ -434,7 +436,12 @@ class ShopContext:
         elif self.shop_type == "final":
             return self.refresh_cost + self.min_buyable_price
         else:
-            logger.error(f"未知商店类型 {self.shop_type}，如你没有修改过代码，请联系开发人员")
+            logger.error(
+                "$agent.custom.action.climb_tower_shop.context.refresh_threshold.unknown_shop_type",
+                {
+                    "shop_type": self.shop_type,
+                },
+            )
             return self.refresh_cost + self.min_buyable_price
 
     @property

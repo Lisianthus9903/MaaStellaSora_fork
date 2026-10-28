@@ -80,7 +80,9 @@ def _claim_run(context: Context) -> bool:
     global _owner_job
     job = context.get_task_job()
     if _owner_job is not None and _owner_job.job_id != job.job_id and not _owner_job.done:
-        logger.error("灾变防线：已有任务正在运行，拒绝并发走位或重置")
+        logger.error(
+            "$agent.custom.action.cataclysm_survivor_move._claim_run.concurrent_task_rejected"
+        )
         return False
     if _owner_job is None or _owner_job.job_id != job.job_id:
         _reset_state()
@@ -153,7 +155,12 @@ def _release_all(context: Context) -> bool:
             released.add(key)
     missing = set(ALL_KEYS) - released
     if missing:
-        logger.error("灾变防线：无法确认方向键已释放（键码 %s），停止走位", sorted(missing))
+        logger.error(
+            "$agent.custom.action.cataclysm_survivor_move._release_all.key_release_unconfirmed",
+            {
+                "value_1": sorted(missing),
+            },
+        )
     return not missing
 
 
@@ -203,15 +210,25 @@ def _update_stillness(image, now: float, still_seconds: float, still_ratio: floa
         if now - _state.get("ratio_log_at", 0.0) >= RATIO_LOG_INTERVAL:
             _state["ratio_log_at"] = now
             counting = "，静止计时中" if _state.get("still_since") else ""
-            logger.info(f"灾变防线：画面变化率 {ratio:.4f}（静止阈值 {still_ratio:.3f}{counting}）")
+            logger.info(
+                "$agent.custom.action.cataclysm_survivor_move._update_stillness.screen_change_rate",
+                {
+                    "ratio": ratio,
+                    "still_ratio": still_ratio,
+                    "counting": counting,
+                },
+            )
 
         if ratio < still_ratio:
             since = _state.get("still_since")
             if since is None:
                 _state["still_since"] = now
                 logger.info(
-                    f"灾变防线：画面已静止（变化率 {ratio:.4f}），"
-                    f"持续 {still_seconds:.0f} 秒后尝试进入传送门"
+                    "$agent.custom.action.cataclysm_survivor_move._update_stillness.screen_still",
+                    {
+                        "ratio": ratio,
+                        "still_seconds": still_seconds,
+                    },
                 )
             elif now - since >= still_seconds:
                 _state["last_gray"] = gray
@@ -219,7 +236,12 @@ def _update_stillness(image, now: float, still_seconds: float, still_ratio: floa
                 return True
         else:
             if _state.get("still_since") is not None:
-                logger.info(f"灾变防线：画面恢复变化（变化率 {ratio:.4f}），静止计时清零")
+                logger.info(
+                    "$agent.custom.action.cataclysm_survivor_move._update_stillness.screen_motion_resumed",
+                    {
+                        "ratio": ratio,
+                    },
+                )
             _state["still_since"] = None
 
     else:
@@ -252,7 +274,12 @@ def _hold(context: Context, keys: tuple[int, ...], seconds: float) -> str:
             if not wait_job(context, controller.post_key_down(key)):
                 outcome = "stopped" if context.tasker.stopping else "failed"
                 if outcome == "failed":
-                    logger.error("灾变防线：方向键按下失败（键码 %d）", key)
+                    logger.error(
+                        "$agent.custom.action.cataclysm_survivor_move._hold.key_press_failed",
+                        {
+                            "value_1": key,
+                        },
+                    )
                 break
 
         deadline = time.monotonic() + seconds
@@ -262,7 +289,7 @@ def _hold(context: Context, keys: tuple[int, ...], seconds: float) -> str:
                 break
             image = _grab(context)
             if image is None:
-                logger.error("灾变防线：走位期间截图失败，停止按键")
+                logger.error("$agent.custom.action.cataclysm_survivor_move._hold.screenshot_failed")
                 outcome = "failed"
                 break
             if _is_black(image):
@@ -284,7 +311,9 @@ class CataclysmSurvivorReset(CustomAction):
     def run(self, context: Context, argv: CustomAction.RunArg) -> bool:
         # 反向 RPC 可能重入 Agent 回调；不阻塞等锁，避免阻塞原动作的清理。
         if not _action_lock.acquire(blocking=False):
-            logger.error("灾变防线：走位动作执行中，拒绝并发重置")
+            logger.error(
+                "$agent.custom.action.cataclysm_survivor_move.run.concurrent_reset_rejected"
+            )
             return False
         try:
             if not _claim_run(context):
@@ -301,7 +330,9 @@ class CataclysmSurvivorMove(CustomAction):
 
     def run(self, context: Context, argv: CustomAction.RunArg) -> bool:
         if not _action_lock.acquire(blocking=False):
-            logger.error("灾变防线：走位动作执行中，拒绝并发调用")
+            logger.error(
+                "$agent.custom.action.cataclysm_survivor_move.run.concurrent_invocation_rejected"
+            )
             return False
         try:
             return self._run(context, argv) if _claim_run(context) else False
@@ -331,8 +362,12 @@ class CataclysmSurvivorMove(CustomAction):
             _state["force_at"] = now + max_wait
             _state["phase"] = PHASE_WAIT
             logger.info(
-                f"灾变防线：进入战斗循环，{min_wait:.0f} 秒后开始检测画面静止"
-                f"（静止 {still_seconds:.0f} 秒即尝试进入传送门，最长等 {max_wait:.0f} 秒）"
+                "$agent.custom.action.cataclysm_survivor_move._run.combat_loop_started",
+                {
+                    "min_wait": min_wait,
+                    "still_seconds": still_seconds,
+                    "max_wait": max_wait,
+                },
             )
             return True
 
@@ -344,7 +379,7 @@ class CataclysmSurvivorMove(CustomAction):
             image = _grab(context)
             ready = _update_stillness(image, time.monotonic(), still_seconds, still_ratio, pixel_diff)
             if image is None:
-                logger.error("灾变防线：等待走位时截图失败，停止任务")
+                logger.error("$agent.custom.action.cataclysm_survivor_move._run.screenshot_failed")
                 return False
 
             ## 刚开始的一段时间不采信静止（避免上半场某段平静时误判）
@@ -356,12 +391,23 @@ class CataclysmSurvivorMove(CustomAction):
             if not ready and max_wait > 0 and now >= _state.get("force_at", 0.0):
                 _state["force_at"] = now + max_wait
                 ready = True
-                logger.warning(f"灾变防线：已等满 {max_wait:.0f} 秒画面仍未静止，强制尝试进入传送门")
+                logger.warning(
+                    "$agent.custom.action.cataclysm_survivor_move._run.stillness_wait_limit_reached",
+                    {
+                        "max_wait": max_wait,
+                    },
+                )
 
             if ready:
                 _state["phase"] = PHASE_LEFT
                 _state["attempt"] = _state.get("attempt", 0) + 1
-                logger.info(f"灾变防线：尝试进入传送门({_state['attempt']}/{attempts})")
+                logger.info(
+                    "$agent.custom.action.cataclysm_survivor_move._run.portal_attempt",
+                    {
+                        "attempt": _state['attempt'],
+                        "attempts": attempts,
+                    },
+                )
             return True
 
         if phase == PHASE_LEFT:
@@ -381,8 +427,15 @@ class CataclysmSurvivorMove(CustomAction):
         if moved >= 0:
             hint = "（画面几乎没变，按键可能没生效）" if moved < still_ratio else ""
             logger.info(
-                f"灾变防线：尝试进入传送门({attempt}/{attempts}) 按住 {label} {seconds:.0f} 秒，"
-                f"画面变化率 {moved:.4f}{hint}"
+                "$agent.custom.action.cataclysm_survivor_move._run.screen_change_rate",
+                {
+                    "attempt": attempt,
+                    "attempts": attempts,
+                    "label": label,
+                    "seconds": seconds,
+                    "moved": moved,
+                    "hint": hint,
+                },
             )
 
         if outcome == "stopped":
@@ -395,28 +448,51 @@ class CataclysmSurvivorMove(CustomAction):
             stopped, tail = _settle(context, still_ratio, pixel_diff)
             if not stopped:
                 _release_all(context)
-                logger.error(f"灾变防线：松开 {label} 后未确认停稳（变化率 {tail:.4f}），停止走位")
+                logger.error(
+                    "$agent.custom.action.cataclysm_survivor_move._run.movement_not_stable",
+                    {
+                        "label": label,
+                        "tail": tail,
+                    },
+                )
                 return False
 
         if outcome == "entered":
             _state["entered"] = True
             _state["phase"] = PHASE_DONE
-            logger.info("灾变防线：检测到加载黑屏，已进入传送门，下半场开始")
+            logger.info("$agent.custom.action.cataclysm_survivor_move._run.portal_entered")
             return True
 
         if phase == PHASE_LEFT:
             _state["phase"] = PHASE_PORTAL
-            logger.info(f"灾变防线：尝试进入传送门({attempt}/{attempts}) 已走到左上角，改按 S+D")
+            logger.info(
+                "$agent.custom.action.cataclysm_survivor_move._run.portal_corner_reached",
+                {
+                    "attempt": attempt,
+                    "attempts": attempts,
+                },
+            )
             return True
 
         ## PHASE_PORTAL 按满仍未进门
         if attempt >= attempts:
             _state["phase"] = PHASE_DONE
-            logger.warning(f"灾变防线：尝试进入传送门已达上限({attempts} 次)仍未成功，交回主循环")
+            logger.warning(
+                "$agent.custom.action.cataclysm_survivor_move._run.portal_portal_attempt",
+                {
+                    "attempts": attempts,
+                },
+            )
         else:
             ## 回到「等画面静止」：若上半场其实没结束，画面会重新动起来，就继续等
             _state["phase"] = PHASE_WAIT
             _state["still_since"] = None
             _state["last_gray"] = None
-            logger.info(f"灾变防线：尝试进入传送门({attempt}/{attempts}) 未检测到加载，回到等待重试")
+            logger.info(
+                "$agent.custom.action.cataclysm_survivor_move._run.portal_loading_not_detected",
+                {
+                    "attempt": attempt,
+                    "attempts": attempts,
+                },
+            )
         return True

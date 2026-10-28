@@ -48,11 +48,13 @@ class I18nFilter(logging.Filter):
         if getattr(record, "_i18n_processed", False):
             return True
         record._i18n_processed = True
+        record.i18n_key = "-"
 
         if not isinstance(record.msg, str) or not record.msg.startswith("$"):
             return True
 
-        translation = _TRANSLATIONS.get(record.msg[1:])
+        record.i18n_key = record.msg[1:]
+        translation = _TRANSLATIONS.get(record.i18n_key)
         if translation is None:
             if isinstance(record.args, Mapping):
                 record.args = ()
@@ -140,7 +142,7 @@ def _add_file_handler(logger: logging.Logger) -> None:
     handler.addFilter(I18nFilter())
     handler.setFormatter(
         logging.Formatter(
-            "[%(asctime)s]%(levelname)s|%(name)s|%(message)s",
+            "[%(asctime)s]%(levelname)s|%(name)s|%(i18n_key)s|%(message)s",
             datefmt="%Y-%m-%d %H:%M:%S",
         )
     )
@@ -182,6 +184,11 @@ if __name__ == "__main__":
     logger = get_logger("custom.example")
     logger.info(f"当前语言: {lang}")
     logger.info("$test.greeting", {"name": "MaaStellaSora"})
+    file_logger = logging.getLogger(_CUSTOM_LOGGER_NAME)
+    file_handler = next(handler for handler in file_logger.handlers if isinstance(handler, _FileHandler))
+    file_handler.flush()
+    log_content = Path(file_handler.baseFilename).read_text(encoding="utf-8")
+    assert "|test.greeting|Hello, MaaStellaSora!" in log_content
 
     logger.debug("这条debug不会显示")
     logger.info("这是一条信息")

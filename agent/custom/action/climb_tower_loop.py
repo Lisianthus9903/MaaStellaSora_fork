@@ -41,19 +41,27 @@ class AscensionLoop(CustomAction):
 
         # 纪录目标识别失败：直接停止爬塔流程
         if attachment.get("record_level", -1) < 0 or attachment.get("potential_count", -1) < 0:
-            logger.error("纪录等级或纪录潜能数识别失败，为保证爬塔质量，将结束爬塔")
+            logger.error("$agent.custom.action.climb_tower_loop.run.record_data_recognition_failed")
             return False
 
         # 已达到纪录目标：与爬塔次数用尽一样，正常回到主页结束
         if self._reached_record_target(attachment):
             logger.info(
-                f"纪录等级 {attachment.get('record_level')}、纪录潜能数 "
-                f"{attachment.get('potential_count')} 已达设定目标，结束爬塔"
+                "$agent.custom.action.climb_tower_loop.run.target_reached",
+                {
+                    "value": attachment.get('record_level'),
+                    "value_2": attachment.get('potential_count'),
+                },
             )
             return True
 
         if loop_count > 0:
-            logger.info(f"完成一次爬塔，剩余爬塔次数：{loop_count}")
+            logger.info(
+                "$agent.custom.action.climb_tower_loop.run.tower_run_completed",
+                {
+                    "loop_count": loop_count,
+                },
+            )
             attachment["loop_count"] = loop_count
             context.override_pipeline({
                 argv.node_name: {
@@ -63,7 +71,7 @@ class AscensionLoop(CustomAction):
             # 关闭返回主页节点，以继续爬塔循环
             context.override_pipeline(HOME_NODE_OFF)
         else:
-            logger.info("爬塔已完成，回到主页")
+            logger.info("$agent.custom.action.climb_tower_loop.run.tower_completed")
 
         return True
 

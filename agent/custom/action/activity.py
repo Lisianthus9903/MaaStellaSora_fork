@@ -23,17 +23,17 @@ class ActivityChallengeRandomStage(CustomAction):
             return False
         image = context.tasker.controller.post_screencap().wait().get()
         if image is None or image.size == 0:
-            logger.error("活动挑战截图失败")
+            logger.error("$agent.custom.action.activity.run.screenshot_failed")
             return False
         reco_detail = context.run_recognition("活动挑战_识别可选关卡", image)
 
         if not reco_detail or not reco_detail.hit:
-            logger.error("没有识别到可选择的 2-x 活动挑战关卡")
+            logger.error("$agent.custom.action.activity.run.selectable_stage_not_found")
             return False
 
         candidates = list(reco_detail.filtered_results or [])
         if not candidates:
-            logger.error("2-x 活动挑战关卡识别结果为空")
+            logger.error("$agent.custom.action.activity.run.recognition_result_empty")
             return False
 
         stage = random.choice(candidates)
@@ -44,14 +44,16 @@ class ActivityChallengeRandomStage(CustomAction):
         if context.tasker.stopping:
             return False
         if not context.tasker.controller.post_click(click_x, click_y).wait().succeeded:
-            logger.error("点击活动挑战关卡失败")
+            logger.error("$agent.custom.action.activity.run.click_failed")
             return False
         logger.info(
-            "随机选择活动挑战关卡：%s（候选 %d 个，点击坐标 %d,%d）",
-            stage.text,
-            len(candidates),
-            click_x,
-            click_y,
+            "$agent.custom.action.activity.run.stage_selected",
+            {
+                "value_1": stage.text,
+                "value_2": len(candidates),
+                "value_3": click_x,
+                "value_4": click_y,
+            },
         )
         return True
 
@@ -73,20 +75,44 @@ class ActivityChallengeBattleLoop(CustomAction):
             if context.tasker.stopping:
                 return False
 
-            logger.info("开始第 %d/%d 次活动挑战", current, count)
+            logger.info(
+                "$agent.custom.action.activity.run.challenge_started",
+                {
+                    "value_1": current,
+                    "value_2": count,
+                },
+            )
             battle_result = context.run_task("活动挑战_单次挑战")
             if not battle_result or not battle_result.status.succeeded:
-                logger.error("第 %d/%d 次活动挑战未能完成战斗", current, count)
+                logger.error(
+                    "$agent.custom.action.activity.run.battle_not_completed",
+                    {
+                        "value_1": current,
+                        "value_2": count,
+                    },
+                )
                 return False
 
             if context.tasker.stopping:
                 return False
             settle_result = context.run_task("活动挑战_结算并返回")
             if not settle_result or not settle_result.status.succeeded:
-                logger.error("第 %d/%d 次活动挑战未能返回关卡列表", current, count)
+                logger.error(
+                    "$agent.custom.action.activity.run.return_to_stage_list_failed",
+                    {
+                        "value_1": current,
+                        "value_2": count,
+                    },
+                )
                 return False
 
-            logger.info("已完成第 %d/%d 次活动挑战", current, count)
+            logger.info(
+                "$agent.custom.action.activity.run.challenge_completed",
+                {
+                    "value_1": current,
+                    "value_2": count,
+                },
+            )
 
         return True
 
@@ -97,11 +123,22 @@ class ActivityChallengeBattleLoop(CustomAction):
                 raw = raw.decode("utf-8", errors="replace")
             count = int(str(raw).strip())
         except (TypeError, ValueError) as exc:
-            logger.error("活动挑战次数无效：%r（%s）", raw, exc)
+            logger.error(
+                "$agent.custom.action.activity._parse_count.invalid_challenge_count",
+                {
+                    "value_1": raw,
+                    "value_2": exc,
+                },
+            )
             return None
 
         if count < 1:
-            logger.error("活动挑战次数必须大于 0，实际为 %d", count)
+            logger.error(
+                "$agent.custom.action.activity._parse_count.challenge_count_must_be_positive",
+                {
+                    "value_1": count,
+                },
+            )
             return None
 
         return count

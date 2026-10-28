@@ -59,20 +59,24 @@ class ChoosePotentialRecognition(CustomRecognition):
             if potential:
                 break
             if not handler.data.refreshable: # 兜底选择
-                logger.info("[潜能选择] 没有找到符合条件的潜能，按照保底顺序选择")
+                logger.info(
+                    "$agent.custom.reco.climb_tower_potential.main.analyze.no_matching_potential"
+                )
                 potential = handler.choose_fallback_potential()
                 break
-            logger.info("没有找到符合条件的潜能，尝试刷新")
+            logger.info(
+                "$agent.custom.reco.climb_tower_potential.main.analyze.potential_no_matching_potential"
+            )
             if not handler.refresh(): # 刷新潜能
-                return self._handle_fatal_error(context, "刷新潜能失败，为保证爬塔质量，将中止任务")
+                return self._handle_fatal_error(context, "$agent.custom.reco.climb_tower_potential.main.refresh_failed")
 
         # 防御性检查
         if not potential:
-            return self._handle_fatal_error(context, "潜能选择出现问题，为保证爬塔质量，将中止任务")
+            return self._handle_fatal_error(context, "$agent.custom.reco.climb_tower_potential.main.selection_failed")
 
         # 4. 点击潜能
         if not handler.pick(potential):
-            return self._handle_fatal_error(context, "点击潜能失败，为保证爬塔质量，将中止任务")
+            return self._handle_fatal_error(context, "$agent.custom.reco.climb_tower_potential.main.pick_failed")
 
         # 5. 保存已选潜能数据到状态类中
         handler.cache_potential_data(potential)

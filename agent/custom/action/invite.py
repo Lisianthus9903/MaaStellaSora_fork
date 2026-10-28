@@ -58,14 +58,24 @@ class InviteAuto(CustomAction):
             if not trekker_name or trekker_name in ("x", "X"):
                 continue
             if self._normalize_name(trekker_name) in selected:
-                self.logger.info(f"邀约对象 '{trekker_name}' 已由自动查找记录，跳过手填重复项")
+                self.logger.info(
+                    "$agent.custom.action.invite.run.duplicate_invitee_skipped",
+                    {
+                        "trekker_name": trekker_name,
+                    },
+                )
                 continue
             selected.add(self._normalize_name(trekker_name))
             queue.append((trekker_name, choose_gift))
 
         # 每日上限 5 人
         queue = queue[:5]
-        self.logger.info(f"邀约名单：{", ".join([name for name, _ in queue])}")
+        self.logger.info(
+            "$agent.custom.action.invite.run.invite_list",
+            {
+                "value": ", ".join([name for name, _ in queue]),
+            },
+        )
 
         for trekker_name, choose_gift in queue:
             if context.tasker.stopping:
@@ -119,7 +129,9 @@ class InviteAuto(CustomAction):
             return False
         reco_detail = context.run_recognition("邀约_达上限", image)
         if reco_detail and reco_detail.hit:
-            self.logger.info("邀约次数已达到本日上限")
+            self.logger.info(
+                "$agent.custom.action.invite._hit_daily_limit.daily_invite_limit_reached"
+            )
             return True
         return False
 
@@ -142,7 +154,13 @@ class InviteAuto(CustomAction):
             trekker_name = trekker_name.strip()
             choose_gift = trekker_info['attach']['gift']
         except (TypeError, KeyError, IndexError, AttributeError) as e:
-            self.logger.warning(f"提取节点'{node}'的文本过程中出现问题: {e}")
+            self.logger.warning(
+                "$agent.custom.action.invite._get_trekker_info.warning",
+                {
+                    "node": node,
+                    "e": e,
+                },
+            )
             trekker_name = ""
             choose_gift = ""
 
@@ -282,7 +300,7 @@ class InviteAuto(CustomAction):
             return True
 
         if not context.override_image("invite_scroll_down_template", image):
-            self.logger.error("截图错误，将无法判断是否滑动到底部")
+            self.logger.error("$agent.custom.action.invite._scroll_to_next_page.screenshot_failed")
             return True
 
         if context.tasker.stopping:
@@ -323,7 +341,7 @@ class InviteAuto(CustomAction):
             if image is None or image.size == 0:
                 return False
             if not context.override_image("invite_scroll_up_template", image):
-                self.logger.error("截图错误，将无法判断是否滑动到顶部")
+                self.logger.error("$agent.custom.action.invite._scroll_to_top.screenshot_failed")
                 return False
 
             if context.tasker.stopping:
@@ -374,7 +392,12 @@ class InviteAuto(CustomAction):
         pending = []       # 命中「未收集」的角色名
         seen = set()       # 已点击处理过的角色名（规范化后），仅用于跨翻页去重
 
-        self.logger.info(f"开始自动查找未收集回忆的角色，最多查找 {max_find_count} 人")
+        self.logger.info(
+            "$agent.custom.action.invite._auto_find_uncollected.started",
+            {
+                "max_find_count": max_find_count,
+            },
+        )
 
         while not context.tasker.stopping:
             image = context.tasker.controller.post_screencap().wait().get()
@@ -410,7 +433,12 @@ class InviteAuto(CustomAction):
                 hit = context.run_recognition("邀约_未收集回忆", image)
                 if hit and hit.hit:
                     pending.append(r['text'])
-                    self.logger.info(f"发现未收集回忆的角色：{r['text']}")
+                    self.logger.info(
+                        "$agent.custom.action.invite._auto_find_uncollected.uncollected_memory_found",
+                        {
+                            "text": r['text'],
+                        },
+                    )
 
             # 一轮点完，向下翻页，已到底部则停止
             if self._scroll_to_next_page(context):
@@ -454,6 +482,11 @@ class InviteAuto(CustomAction):
                 }
             }
         else:
-            self.logger.error(f"未知的送礼选项：{choose_gift}，将默认只送黄色笑脸")
+            self.logger.error(
+                "$agent.custom.action.invite._get_choose_gift_pipeline.unknown_gift_option",
+                {
+                    "choose_gift": choose_gift,
+                },
+            )
             return {}
         return pipeline_override

@@ -41,7 +41,9 @@ class ShopHandler:
         # 进商店时读取各音符持有数量；未设置任何音符目标时不读取
         self._update_current_melodies()
         if self.data.melodies:
-            logger.info(f"当前有购买需求的音符数量:")
+            logger.info(
+                "$agent.custom.action.climb_tower_shop.handler.read_shop_page_info.melody_purchase_requirements"
+            )
             for melody in self.data.melodies.active_values():
                 logger.info(f"{melody.display_name}: {melody.count}/{melody.required_count}")
 
@@ -81,7 +83,7 @@ class ShopHandler:
             if self._should_enhance_first():
                 if is_over_limit("ENHANCE"):
                     break
-                logger.info("优先执行强化操作")
+                logger.info("$agent.custom.action.climb_tower_shop.handler.execute_buy_plan.status")
                 self._enhance()
                 continue
 
@@ -98,7 +100,9 @@ class ShopHandler:
 
         # 循环被打断时判断是否人工打断，否则判断为超出预期次数
         if not self.interactor.context.tasker.stopping:
-            logger.error("执行强化或购买计划超出预期次数，为保证爬塔质量，将中止任务")
+            logger.error(
+                "$agent.custom.action.climb_tower_shop.handler.execute_buy_plan.task_stopped_for_safety"
+            )
             self.interactor.context.tasker.post_stop()
 
     def refresh(self):
@@ -118,7 +122,9 @@ class ShopHandler:
                 return
             logger.debug("正在等待刷新完成……")
             time.sleep(1)
-        logger.error("等待刷新超时，为保证爬塔质量，将中止任务")
+        logger.error(
+            "$agent.custom.action.climb_tower_shop.handler.refresh.task_stopped_for_safety"
+        )
         self.interactor.context.tasker.post_stop()
 
     def enhance_all(self):
@@ -135,7 +141,7 @@ class ShopHandler:
         # 开始强化
         for _ in range(count):
             if not self._enhance():
-                logger.error(f"强化出现问题，终止强化")
+                logger.error("$agent.custom.action.climb_tower_shop.handler.enhance_all.error")
                 return
 
     def _enhance(self) -> bool:
@@ -209,8 +215,13 @@ class ShopHandler:
                 ))
             else:
                 logger.error(
-                    f"第 {i + 1} 个格子内容识别失败："
-                    f"item_name={item_name}, item_quantity={item_quantity}, item_price={item_price}"
+                    "$agent.custom.action.climb_tower_shop.handler._update_goods_info.recognition_failed",
+                    {
+                        "value": i + 1,
+                        "item_name": item_name,
+                        "item_quantity": item_quantity,
+                        "item_price": item_price,
+                    },
                 )
 
         logger.debug(f"道具列表: {items}")
@@ -310,7 +321,7 @@ class ShopHandler:
     def can_afford_refresh(self) -> bool:
         """判断当前是否满足刷新条件。与data.should_refresh逻辑保持一致"""
         if self.data.refresh_remaining <= 0:
-            logger.info("刷新次数已用完，跳过刷新")
+            logger.info("$agent.custom.action.climb_tower_shop.handler.can_afford_refresh.status")
             return False
 
         coin = self.data.current_coin
@@ -319,8 +330,24 @@ class ShopHandler:
         total = threshold + enhancement_cost
 
         if self.data.should_refresh:
-            logger.info(f"可用金币 {coin} 达到刷新标准: 阈值 {threshold} + 强化消耗 {enhancement_cost} = {total}，尝试刷新")
+            logger.info(
+                "$agent.custom.action.climb_tower_shop.handler.can_afford_refresh.attempting",
+                {
+                    "coin": coin,
+                    "threshold": threshold,
+                    "enhancement_cost": enhancement_cost,
+                    "total": total,
+                },
+            )
             return True
 
-        logger.info(f"可用金币 {coin} 未达到刷新标准: 阈值 {threshold} + 强化消耗 {enhancement_cost} = {total}，跳过刷新")
+        logger.info(
+            "$agent.custom.action.climb_tower_shop.handler.can_afford_refresh.coin_status",
+            {
+                "coin": coin,
+                "threshold": threshold,
+                "enhancement_cost": enhancement_cost,
+                "total": total,
+            },
+        )
         return False

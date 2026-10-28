@@ -59,11 +59,25 @@ class RecommendationHandler(ChoosePotentialHandler):
             lvl = 99 if potential.recommended_level < 0 and potential.recommended else potential.recommended_level
             recommended_output = f"系统推荐{lvl}级" if lvl > 0 else "无"
             if self.data.core_potential:
-                logger.info(f"[潜能识别] {potential.name} | 核心潜能 | {recommended_output}")
+                logger.info(
+                    "$agent.custom.reco.climb_tower_potential.handler_preset.read_potentials_info.status",
+                    {
+                        "name": potential.name,
+                        "recommended_output": recommended_output,
+                    },
+                )
             else:
                 old = potential.old_level
                 new = potential.new_level
-                logger.info(f"[潜能识别] {potential.name} | 等级 {old}→{new} | {recommended_output}")
+                logger.info(
+                    "$agent.custom.reco.climb_tower_potential.handler_preset.read_potentials_info.potential_status",
+                    {
+                        "name": potential.name,
+                        "old": old,
+                        "new": new,
+                        "recommended_output": recommended_output,
+                    },
+                )
 
     def handle_draw_data(self, potential: Potential | None):
         """（开发者使用）选项打开时，保存潜能抽取数据"""
@@ -78,7 +92,12 @@ class RecommendationHandler(ChoosePotentialHandler):
             best_potential = self._default_chooser() if self.data.refreshable else self.choose_fallback_potential()
 
         if best_potential:
-            logger.info(f"[潜能选择] {best_potential.name}")
+            logger.info(
+                "$agent.custom.reco.climb_tower_potential.handler_preset.choose_potential.selected",
+                {
+                    "name": best_potential.name,
+                },
+            )
 
         return best_potential
 
@@ -162,7 +181,14 @@ class RecommendationHandler(ChoosePotentialHandler):
         threshold = max(0.0, threshold)
 
         # 当前潜能到达刷新分数阈值，直接选当前最优，否则返回 None 让外层刷新。
-        logger.info(f"当前最优潜能 {best_potential.name} 得分 {best_potential.score}，阈值 {threshold}")
+        logger.info(
+            "$agent.custom.reco.climb_tower_potential.handler_preset._tower_8_chooser.best_potential",
+            {
+                "name": best_potential.name,
+                "score": best_potential.score,
+                "threshold": threshold,
+            },
+        )
         if best_potential.score >= threshold:
             self._tower_8_record(best_potential)
             return best_potential
@@ -182,7 +208,9 @@ class RecommendationHandler(ChoosePotentialHandler):
         # 传入OwnedPotential对象时，需要设置等级跨度，然后转为Potential对象处理
         if isinstance(p, OwnedPotential):
             if level_span == 0:
-                logger.warning("传入OwnedPotential对象时未设置等级跨度，将默认为1")
+                logger.warning(
+                    "$agent.custom.reco.climb_tower_potential.handler_preset._tower_8_score.fallback"
+                )
                 level_span = 1
             p = self.dummy_potential(
                 name=p.name, trekker=p.trekker, old_level=p.level, new_level=min(6, p.level + level_span),
@@ -528,12 +556,27 @@ class RecommendationHandler(ChoosePotentialHandler):
             State.enhance_high_level_span_count = 0
 
         State.potentials_level_count += p.level_span
-        logger.info(f"潜能计数 {State.potentials_level_count}")
+        logger.info(
+            "$agent.custom.reco.climb_tower_potential.handler_preset._tower_8_record.count",
+            {
+                "potentials_level_count": State.potentials_level_count,
+            },
+        )
         if not p.core:
             if p.old_level == 0 and p.level_span >= 3:
                 State.high_level_span_count += 1
-                logger.info(f"辉光的奇迹计数 {State.high_level_span_count}/10")
+                logger.info(
+                    "$agent.custom.reco.climb_tower_potential.handler_preset._tower_8_record.glory_miracle_count",
+                    {
+                        "high_level_span_count": State.high_level_span_count,
+                    },
+                )
 
             if p.old_level > 0 and p.level_span == 2:
                 State.enhance_high_level_span_count += 1
-                logger.info(f"潜能飞升计数 {State.enhance_high_level_span_count}/5")
+                logger.info(
+                    "$agent.custom.reco.climb_tower_potential.handler_preset._tower_8_record.potential_ascension_count",
+                    {
+                        "enhance_high_level_span_count": State.enhance_high_level_span_count,
+                    },
+                )

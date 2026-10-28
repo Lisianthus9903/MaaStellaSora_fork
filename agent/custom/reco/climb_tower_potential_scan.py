@@ -64,9 +64,13 @@ class BagInteractor(PotentialInteractor):
     def get_trekker_name_roi_from_bag(self) -> list[int]:
         results = self._recognize("星塔_背包_潜能标记_agent")
         if len(results) > 1:
-            logger.warning("识别到多个潜能标记，无法确定旅人名称位置")
+            logger.warning(
+                "$agent.custom.reco.climb_tower_potential_scan.get_trekker_name_roi_from_bag.multiple_potential_markers"
+            )
         if len(results) == 0:
-            logger.error("未识别到潜能标记，无法确定旅人名称位置")
+            logger.error(
+                "$agent.custom.reco.climb_tower_potential_scan.get_trekker_name_roi_from_bag.potential_marker_not_found"
+            )
             return []
         roi = results[0].box
         return [TREKKER_X, roi[1] - TREKKER_Y_OFFSET, TREKKER_W, TREKKER_H]
@@ -74,23 +78,31 @@ class BagInteractor(PotentialInteractor):
     def get_upper_scroll_begin_point_from_bag(self) -> list[int]:
         results = self._recognize("星塔_背包_潜能标记_agent")
         if not results or len(results) > 1:
-            logger.error("无法定位潜能种类标记位置")
+            logger.error(
+                "$agent.custom.reco.climb_tower_potential_scan.get_upper_scroll_begin_point_from_bag.potential_type_marker_not_found"
+            )
             return []
         return [640, results[0].box[1]]
 
     def get_lower_scroll_begin_point_from_bag(self) -> list[int]:
         ocr_results = self._recognize("星塔_背包_通用潜能标记_agent")
         if not ocr_results or len(ocr_results) > 1:
-            logger.error("无法定位通用潜能位置")
+            logger.error(
+                "$agent.custom.reco.climb_tower_potential_scan.get_lower_scroll_begin_point_from_bag.universal_potential_not_found"
+            )
             return []
         return [640, ocr_results[0].box[1]]
 
     def get_upper_potential_ys_from_bag(self) -> tuple[int, int]:
         results = self._recognize("星塔_背包_潜能标记_agent")
         if len(results) > 1:
-            logger.warning("识别到多个潜能标记，无法确定潜能行位置")
+            logger.warning(
+                "$agent.custom.reco.climb_tower_potential_scan.get_upper_potential_ys_from_bag.multiple_potential_markers"
+            )
         if len(results) == 0:
-            logger.error("未识别到潜能标记，无法确定潜能行位置")
+            logger.error(
+                "$agent.custom.reco.climb_tower_potential_scan.get_upper_potential_ys_from_bag.potential_marker_not_found"
+            )
             return 0, 0
         roi = results[0].box
         return roi[1] + UPPER_POTENTIAL_FIRST_ROW_Y_OFFSET, roi[1] + UPPER_POTENTIAL_SECOND_ROW_Y_OFFSET
@@ -98,7 +110,9 @@ class BagInteractor(PotentialInteractor):
     def get_lower_potential_ys_from_bag(self) -> tuple[int, int]:
         ocr_results = self._recognize("星塔_背包_通用潜能标记_agent")
         if len(ocr_results) == 0:
-            logger.error("未识别到潜能标记，无法确定潜能行位置")
+            logger.error(
+                "$agent.custom.reco.climb_tower_potential_scan.get_lower_potential_ys_from_bag.potential_marker_not_found"
+            )
             return 0, 0
         roi = ocr_results[0].box
         return roi[1] + LOWER_POTENTIAL_FIRST_ROW_Y_OFFSET, roi[1] + LOWER_POTENTIAL_SECOND_ROW_Y_OFFSET
@@ -115,7 +129,9 @@ class BagInteractor(PotentialInteractor):
     def get_potential_level_from_bag(self, roi: list[int]) -> int:
         ocr_results = self._recognize("星塔_背包_识别潜能等级_agent", roi=roi)
         if not ocr_results:
-            logger.warning("未识别到潜能等级，将默认为0")
+            logger.warning(
+                "$agent.custom.reco.climb_tower_potential_scan.get_potential_level_from_bag.potential_level_not_found"
+            )
             return 0
         return int(ocr_results[0].text)
 
@@ -123,7 +139,9 @@ class BagInteractor(PotentialInteractor):
     def get_potential_recommend_level_from_bag(self, roi: list[int]) -> int:
         ocr_results = self._recognize("星塔_背包_识别推荐等级_agent", roi=roi)
         if not ocr_results:
-            logger.warning("未识别到推荐等级，将默认为0")
+            logger.warning(
+                "$agent.custom.reco.climb_tower_potential_scan.get_potential_recommend_level_from_bag.recommended_level_not_found"
+            )
             return 0
         return int(ocr_results[0].text)
 
@@ -158,7 +176,9 @@ class PotentialReader:
             else:
                 begin_point = self.screen.get_upper_scroll_begin_point_from_bag()
                 if not begin_point:
-                    logger.error("无法定位潜能种类标记位置，扫描背包潜能失败。")
+                    logger.error(
+                        "$agent.custom.reco.climb_tower_potential_scan.read_potentials.potential_type_marker_not_found"
+                    )
                     return []
                 self.screen.scroll_down(begin_point, SCROLL_END)
 
@@ -167,7 +187,9 @@ class PotentialReader:
             # 通过潜能标记定位前两行的潜能
             first_y, second_y = self.screen.get_upper_potential_ys_from_bag()
             if not first_y or not second_y:
-                logger.error("无法定位潜能位置，扫描背包潜能失败。")
+                logger.error(
+                    "$agent.custom.reco.climb_tower_potential_scan.read_potentials.location_failed"
+                )
                 return []
 
             # 生成潜能列表的roi
@@ -184,7 +206,9 @@ class PotentialReader:
             # 读取完后，识别通用潜能的位置，然后向下滚动到刚好通用潜能处于顶部可见区域
             begin_point = self.screen.get_lower_scroll_begin_point_from_bag()
             if not begin_point:
-                logger.error("无法定位通用潜能位置，扫描背包潜能失败。")
+                logger.error(
+                    "$agent.custom.reco.climb_tower_potential_scan.read_potentials.universal_potential_not_found"
+                )
                 return []
             self.screen.scroll_down(begin_point, SCROLL_END)
             # 截图
@@ -192,7 +216,9 @@ class PotentialReader:
             # 然后读取后两行的潜能
             first_y, second_y = self.screen.get_lower_potential_ys_from_bag()
             if not first_y or not second_y:
-                logger.error("无法定位通用潜能位置，扫描背包潜能失败。")
+                logger.error(
+                    "$agent.custom.reco.climb_tower_potential_scan.read_potentials.universal_potential_not_found"
+                )
                 return []
             potential_rois, core_potential_rois, level_rois, recommend_rois = self._generate_rois(first_y, second_y)
             potentials_lower = self._read_rows(potential_rois, core_potential_rois, level_rois, recommend_rois)
@@ -209,7 +235,12 @@ class PotentialReader:
         # 然后反复三次
         # 读取完潜能后，把数据返回，储存到State中
         self.screen.close_bag()
-        logger.info(f"读取到 {len(potentials)} 个潜能")
+        logger.info(
+            "$agent.custom.reco.climb_tower_potential_scan.read_potentials.count",
+            {
+                "count": len(potentials),
+            },
+        )
         return potentials
 
     def _read_rows(

@@ -111,5 +111,11 @@ def save_image(image: np.ndarray, comment: str) -> bool:
         _save_png_stdlib(file_path, image)
         return True
     except Exception as exc:  # pragma: no cover - 调试日志
-        logger.warning(f"保存图片 {filename} 失败: {exc}")
+        logger.warning(
+            "$agent.utils.image_handler.save_image.warning",
+            {
+                "filename": filename,
+                "exc": exc,
+            },
+        )
         return False

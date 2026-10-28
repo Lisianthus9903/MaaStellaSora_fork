@@ -16,7 +16,7 @@ class PotentialInteractor(Interactor):
     def refresh(self) -> bool:
         run_result = self.context.run_task("星塔_节点_选择潜能_点击刷新_agent")
         if not run_result or not run_result.status.succeeded:
-            logger.error(f"点击刷新潜能失败")
+            logger.error("$agent.custom.reco.climb_tower_potential.interactor.refresh.click_failed")
             return False
         self.screenshot()
         return True
@@ -30,7 +30,9 @@ class PotentialInteractor(Interactor):
         try:
             return int(ocr_results[0].text)
         except (ValueError, TypeError, IndexError):
-            logger.error("未识别到当前金币，将默认为-1")
+            logger.error(
+                "$agent.custom.reco.climb_tower_potential.interactor.get_current_coin.current_coin_not_recognized"
+            )
             return -1
 
     def get_refresh_cost(self) -> int:
@@ -80,7 +82,12 @@ class PotentialInteractor(Interactor):
         if len(full_text) >= 2:
             # 取前两个数字处理粘连
             return int(full_text[0]), int(full_text[1])
-        logger.warning(f"无法解析潜能等级（识别到的等级文本: {texts}）")
+        logger.warning(
+            "$agent.custom.reco.climb_tower_potential.interactor._parse_level_text.potential_level_parse_failed",
+            {
+                "texts": texts,
+            },
+        )
         return -1, -1
 
     def get_recommend_level(self, roi: list[int]) -> int:
@@ -88,7 +95,9 @@ class PotentialInteractor(Interactor):
         try:
             return int(ocr_results[0].text)
         except (ValueError, TypeError, IndexError):
-            logger.error("未识别到推荐等级，将默认为-1")
+            logger.error(
+                "$agent.custom.reco.climb_tower_potential.interactor.get_recommend_level.recommended_level_not_found"
+            )
             return -1
 
     def check_item_list_visibility(self) -> bool:
@@ -124,10 +133,17 @@ class PotentialInteractor(Interactor):
         potential_count = len(potentials_rarity)
 
         if potential_count == 0:
-            logger.error("潜能数量识别失败（没有潜能），将默认为3个普通潜能")
+            logger.error(
+                "$agent.custom.reco.climb_tower_potential.interactor.get_potentials_rarity.recognition_failed"
+            )
             return ["common", "common", "common"]
         elif potential_count > 3:
-            logger.error(f"潜能数量识别失败（识别到{potential_count}个潜能，不符合预期），将默认为3个普通潜能")
+            logger.error(
+                "$agent.custom.reco.climb_tower_potential.interactor.get_potentials_rarity.potential_count_recognition_failed",
+                {
+                    "potential_count": potential_count,
+                },
+            )
             return ["common", "common", "common"]
 
         return potentials_rarity
@@ -160,7 +176,9 @@ class PotentialInteractor(Interactor):
         matched = next((i for i, (low, high) in enumerate(bounds) if low <= hit_x <= high), None)
 
         if matched is None:
-            logger.error("拿到按钮识别失败，潜能选择可能会出现问题")
+            logger.error(
+                "$agent.custom.reco.climb_tower_potential.interactor.get_selected_potential_index.recognition_failed"
+            )
             matched = 0
 
         return matched

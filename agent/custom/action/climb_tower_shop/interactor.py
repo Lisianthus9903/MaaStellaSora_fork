@@ -13,7 +13,9 @@ class ShopInteractor(Interactor):
         run_result = self.context.run_task("星塔_节点_商店_商店层_进入购物界面_agent")
         self.image = self.context.tasker.controller.cached_image
         if not (run_result and run_result.status.succeeded):
-            logger.warning("进入购物界面失败")
+            logger.warning(
+                "$agent.custom.action.climb_tower_shop.interactor.enter_shopping.shop_open_failed"
+            )
             return False
         logger.debug("进入购物界面成功")
         return True
@@ -22,7 +24,9 @@ class ShopInteractor(Interactor):
         """返回商店层主界面。"""
         run_result = self.context.run_task("星塔_节点_商店_万能返回商店层_agent")
         if not (run_result and run_result.status.succeeded):
-            logger.warning("返回商店层主界面失败")
+            logger.warning(
+                "$agent.custom.action.climb_tower_shop.interactor.back_to_main_page.shop_return_failed"
+            )
             return False
         logger.debug("返回商店层主界面成功")
         return True
@@ -38,9 +42,13 @@ class ShopInteractor(Interactor):
         }
         run_result = self.context.run_task("星塔_节点_商店_点击强化_agent", pipeline_override)
         if not (run_result and run_result.status.succeeded):
-            logger.warning("强化失败，可能已经没有潜能可以强化")
+            logger.warning(
+                "$agent.custom.action.climb_tower_shop.interactor.enhance.enhancement_failed"
+            )
             return False
-        logger.info("强化成功")
+        logger.info(
+            "$agent.custom.action.climb_tower_shop.interactor.enhance.enhancement_succeeded"
+        )
         return True
 
     def get_current_coin(self) -> int:
@@ -48,7 +56,9 @@ class ShopInteractor(Interactor):
         try:
             return int(ocr_results[0].text)
         except (ValueError, TypeError, IndexError):
-            logger.error("未识别到当前金币，将默认为-1")
+            logger.error(
+                "$agent.custom.action.climb_tower_shop.interactor.get_current_coin.current_coin_not_recognized"
+            )
             return -1
 
     def get_enhancement_cost(self) -> int:
@@ -58,7 +68,9 @@ class ShopInteractor(Interactor):
         try:
             return int(max(ocr_results, key=lambda r: r.score).text) if self._valid_ocr(node, ocr_results) else -1
         except (ValueError, TypeError, IndexError):
-            logger.error("未识别到强化所需金币，将默认为-1")
+            logger.error(
+                "$agent.custom.action.climb_tower_shop.interactor.get_enhancement_cost.enhancement_cost_not_recognized"
+            )
             return -1
 
     def check_shop_type(self) -> str:

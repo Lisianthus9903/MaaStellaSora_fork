@@ -43,7 +43,14 @@ def buy_general(item: Item, handler: ShopHandler) -> bool:
             }
         }
     }
-    logger.info(f"购买 {item.display_name} * {item.quantity} ({item.price})")
+    logger.info(
+        "$agent.custom.action.climb_tower_shop.pipeline_buyer.buy_general.purchase",
+        {
+            "display_name": item.display_name,
+            "quantity": item.quantity,
+            "price": item.price,
+        },
+    )
     result = context.run_task("星塔_节点_商店_购物_购买道具_agent", override)
 
     # 购买后处理环节
@@ -56,7 +63,12 @@ def buy_general(item: Item, handler: ShopHandler) -> bool:
             handler.data.melodies[item.internal_name].count += item.quantity
         return True
     else:
-        logger.error(f"购买 {item.display_name} 过程出现问题")
+        logger.error(
+            "$agent.custom.action.climb_tower_shop.pipeline_buyer.buy_general.purchase_purchase",
+            {
+                "display_name": item.display_name,
+            },
+        )
         return False
 
 
@@ -81,7 +93,12 @@ def buy_assist_melody(item: Item, handler: ShopHandler) -> bool:
     }
     run_result = handler.interactor.context.run_task("星塔_节点_商店_购买协奏音符_agent", override)
     if not (run_result and run_result.status.succeeded):
-        logger.error(f"点击协奏音符 {item.display_name} 过程出现问题")
+        logger.error(
+            "$agent.custom.action.climb_tower_shop.pipeline_buyer.buy_assist_melody.click_failed",
+            {
+                "display_name": item.display_name,
+            },
+        )
         return False
 
     # 开始验证协奏音符
@@ -90,11 +107,21 @@ def buy_assist_melody(item: Item, handler: ShopHandler) -> bool:
     # 验证是否是协奏音符
     reco_detail = handler.interactor.context.run_recognition("星塔_节点_商店_购买协奏音符_核实协奏_agent", image)
     if not (reco_detail and reco_detail.hit):
-        logger.info(f"{item.display_name} 不是协奏音符")
+        logger.info(
+            "$agent.custom.action.climb_tower_shop.pipeline_buyer.buy_assist_melody.not_a_concerto_melody",
+            {
+                "display_name": item.display_name,
+            },
+        )
         passed = False
     # 验证协奏技能是否解锁
     elif handler.data.params.buy_assist_before_unlock and _is_assist_skill_unlocked(handler):
-        logger.info(f"{item.display_name} 相关协奏技能已解锁，无需购买")
+        logger.info(
+            "$agent.custom.action.climb_tower_shop.pipeline_buyer.buy_assist_melody.purchase_unnecessary",
+            {
+                "display_name": item.display_name,
+            },
+        )
         passed = False
 
     # 如果没有通过验证，关闭确认框
@@ -104,11 +131,23 @@ def buy_assist_melody(item: Item, handler: ShopHandler) -> bool:
         if run_result and run_result.status.succeeded:
             logger.debug(f"关闭购买协奏音符 {item.display_name} 成功")
         else:
-            logger.error(f"关闭购买协奏音符 {item.display_name} 过程出现问题")
+            logger.error(
+                "$agent.custom.action.climb_tower_shop.pipeline_buyer.buy_assist_melody.purchase",
+                {
+                    "display_name": item.display_name,
+                },
+            )
         return False
 
     # 通过验证，确认购买
-    logger.info(f"购买协奏音符 {item.display_name} * {item.quantity} ({item.price})")
+    logger.info(
+        "$agent.custom.action.climb_tower_shop.pipeline_buyer.buy_assist_melody.concerto_melody_purchase",
+        {
+            "display_name": item.display_name,
+            "quantity": item.quantity,
+            "price": item.price,
+        },
+    )
     run_result = handler.interactor.context.run_task("星塔_节点_商店_购物_购买道具_确认购买_agent")
 
     # 购买后处理环节，更新数据
@@ -116,12 +155,22 @@ def buy_assist_melody(item: Item, handler: ShopHandler) -> bool:
     handler.interactor.update_image()
     handler.update_coin()
     if run_result and run_result.status.succeeded:
-        logger.info(f"购买 {item.display_name} 成功")
+        logger.info(
+            "$agent.custom.action.climb_tower_shop.pipeline_buyer.buy_assist_melody.purchase_purchase",
+            {
+                "display_name": item.display_name,
+            },
+        )
         if "melody" in item.internal_name: # 如果是音符要更新数量
             handler.data.melodies[item.internal_name].count += item.quantity
         return True
     else:
-        logger.error(f"购买 {item.display_name} 过程出现问题")
+        logger.error(
+            "$agent.custom.action.climb_tower_shop.pipeline_buyer.buy_assist_melody.purchase_display_name",
+            {
+                "display_name": item.display_name,
+            },
+        )
         return False
 
 def _is_assist_skill_unlocked(handler: ShopHandler) -> bool:
@@ -161,6 +210,8 @@ def _is_assist_skill_unlocked(handler: ShopHandler) -> bool:
             return False
 
     if not text:
-        logger.warning("未能解析到协奏音符文本，默认按已解锁处理")
+        logger.warning(
+            "$agent.custom.action.climb_tower_shop.pipeline_buyer._is_assist_skill_unlocked.concerto_melody_unrecognized"
+        )
 
     return True

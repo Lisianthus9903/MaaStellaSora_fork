@@ -47,7 +47,12 @@ class EventRecognition(CustomRecognition):
 
         # 识别画面中的问题及选项，组合成EventInfo对象
         question_text = self._get_question_text(context, argv.image, lang_type)
-        logger.info(f"[对话选择] 问题：{question_text}")
+        logger.info(
+            "$agent.custom.reco.climb_tower_event.main.analyze.selected",
+            {
+                "question_text": question_text,
+            },
+        )
         choices = self._get_choice_texts(context, argv.image, lang_type)
         if not choices:
             return CustomRecognition.AnalyzeResult(box=None, detail={})
@@ -91,12 +96,23 @@ class EventRecognition(CustomRecognition):
             if rule_custom:
                 custom_function = CUSTOM_RULE_REGISTRY.get(rule_custom)
                 if not custom_function:
-                    logger.warning(f"未找到自定义规则函数：{rule_custom}")
+                    logger.warning(
+                        "$agent.custom.reco.climb_tower_event.main.analyze.warning",
+                        {
+                            "rule_custom": rule_custom,
+                        },
+                    )
                     continue
                 try:
                     matched_choice = custom_function(context, rule, event_info, matched_choices)
                 except Exception as e:
-                    logger.error(f"自定义规则函数执行异常：{e}", exc_info=True)
+                    logger.error(
+                        "$agent.custom.reco.climb_tower_event.main.analyze.exception",
+                        {
+                            "e": e,
+                        },
+                        exc_info=True
+                    )
                     continue
             else:
                 matched_choice = matched_choices[0]
@@ -107,17 +123,37 @@ class EventRecognition(CustomRecognition):
 
             # 5. 所有匹配成功，选择当前选项
             result_choice = matched_choice
-            logger.info(f"[对话选择] 命中规则：{rule_d}")
-            logger.info(f"[对话选择] 选择选项：{result_choice.text}")
-            logger.info(f"[对话选择] 后果: {result_choice.consequence}")
+            logger.info(
+                "$agent.custom.reco.climb_tower_event.main.analyze.dialogue_selected",
+                {
+                    "rule_d": rule_d,
+                },
+            )
+            logger.info(
+                "$agent.custom.reco.climb_tower_event.main.analyze.option_selected",
+                {
+                    "text": result_choice.text,
+                },
+            )
+            logger.info(
+                "$agent.custom.reco.climb_tower_event.main.analyze.selected_consequence",
+                {
+                    "consequence": result_choice.consequence,
+                },
+            )
             logger.debug(f"规则内容: {rule}")
             break
 
         # 兜底：未命中任何规则时选择第一个选项
         if not result_choice:
             result_choice = event_info.choices[0]
-            logger.info(f"[对话选择] 未命中任何规则，保底选择第一个选项")
-            logger.info(f"[对话选择] 选择选项：{result_choice.text}")
+            logger.info("$agent.custom.reco.climb_tower_event.main.analyze.rule_selected")
+            logger.info(
+                "$agent.custom.reco.climb_tower_event.main.analyze.option_selected",
+                {
+                    "text": result_choice.text,
+                },
+            )
             logger.debug(f"[对话选择] 后果: {result_choice.consequence}")
             if DEV_IMAGES_SAVE_ENABLED:
                 from utils.image_handler import save_image

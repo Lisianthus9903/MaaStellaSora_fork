@@ -22,7 +22,9 @@ class ChoosePotentialHandler:
         """
         for _ in range(10):
             if self.screen.check_item_list_visibility():
-                logger.info("识别到干扰文字，等待1秒")
+                logger.info(
+                    "$agent.custom.reco.climb_tower_potential.handler_default.wait_for_item_list_gone.status"
+                )
                 time.sleep(1)
                 self.screen.screenshot()
                 continue
@@ -55,7 +57,9 @@ class ChoosePotentialHandler:
         """最原始的潜能选择，仅靠推荐图标选择潜能"""
         potential = next((p for p in self.data.potentials if p.recommended), None)
         if potential:
-            logger.info(f"[潜能选择] 推荐潜能")
+            logger.info(
+                "$agent.custom.reco.climb_tower_potential.handler_default.choose_potential.selected"
+            )
         return potential
 
     def handle_draw_data(self, potential: Potential | None):
@@ -130,9 +134,21 @@ class ChoosePotentialHandler:
                 unmatched_xs.append(x)
 
         if unmatched_xs:
-            logger.error(f"检测到 {len(unmatched_xs)} 个推荐图标超出所有潜能卡片边界，后续选择将会出现问题")
-            logger.error(f"超出边界的x坐标为{unmatched_xs}")
-            logger.error("为保证爬塔质量，将结束任务")
+            logger.error(
+                "$agent.custom.reco.climb_tower_potential.handler_default._get_recommended_potential_indices.recommendation_out_of_bounds",
+                {
+                    "count": len(unmatched_xs),
+                },
+            )
+            logger.error(
+                "$agent.custom.reco.climb_tower_potential.handler_default._get_recommended_potential_indices.error",
+                {
+                    "unmatched_xs": unmatched_xs,
+                },
+            )
+            logger.error(
+                "$agent.custom.reco.climb_tower_potential.handler_default._get_recommended_potential_indices.task_stopped_for_safety"
+            )
             self.screen.context.tasker.post_stop()
 
         return matched
@@ -166,7 +182,9 @@ class ChoosePotentialHandler:
 
             # 如果trekker超过3个，输出错误日志
             if len(State.trekkers) > 3:
-                logger.error("识别到超过3种旅人，后续潜能判断将会出现问题")
+                logger.error(
+                    "$agent.custom.reco.climb_tower_potential.handler_default._update_trekkers.too_many_trekkers"
+                )
 
     def _get_adjusted_rois(self, base_rois: list[list[int]]) -> list[list[int]]:
         """安全地获取偏移后的 ROI 副本，避免污染原始数据"""
@@ -238,8 +256,12 @@ class ChoosePotentialHandler:
                 self.screen.screenshot()
 
         logger.error(
-            f"刷新潜能失败，等待 {wait_time} 秒后仍未完成 "
-            f"(金币扣除状态: {new_coin >= 0}, 缓存金币: {self.data.current_coin})"
+            "$agent.custom.reco.climb_tower_potential.handler_default.refresh.failed",
+            {
+                "wait_time": wait_time,
+                "new_coin_condition": new_coin >= 0,
+                "current_coin": self.data.current_coin,
+            },
         )
         return False
 

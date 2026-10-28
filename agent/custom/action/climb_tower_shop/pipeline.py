@@ -48,7 +48,12 @@ class BuyPipeline:
         """买入当前目标商品"""
         # 执行 Buy：由 BuyFunc 全权负责 UI 买入 + 后置状态修改（扣金币、减库存、记已买等）
         if not self.target_item:
-            logger.warning(f"策略 [{self.name}] 当前无购买目标")
+            logger.warning(
+                "$agent.custom.action.climb_tower_shop.pipeline.buy.purchase",
+                {
+                    "name": self.name,
+                },
+            )
             return False
         return self.buyer(self.target_item, handler)
 

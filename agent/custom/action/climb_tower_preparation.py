@@ -56,7 +56,13 @@ class AscensionPreparation(CustomAction):
                 float(threshold_coef_str)
                 float(threshold_decay_str)
             except ValueError:
-                logger.error(f"刷新阈值系数{threshold_coef_str}或衰减系数{threshold_decay_str}设置有误，请重新检查")
+                logger.error(
+                    "$agent.custom.action.climb_tower_preparation.run.refresh_coefficients_invalid",
+                    {
+                        "threshold_coef_str": threshold_coef_str,
+                        "threshold_decay_str": threshold_decay_str,
+                    },
+                )
                 return False
 
         # 导入对话选项预案
@@ -65,10 +71,21 @@ class AscensionPreparation(CustomAction):
         event_rules_path = event_rules_path.with_suffix(".json")
         event_rules = self._load_event_rules(event_rules_path)
         if not event_rules: # 不允许空规则
-            logger.error(f"无法加载对话选项规则'{event_rules_file}'")
+            logger.error(
+                "$agent.custom.action.climb_tower_preparation.run.event_rules_load_failed",
+                {
+                    "event_rules_file": event_rules_file,
+                },
+            )
             return False
         context.override_pipeline({"星塔_节点_进行对话选择_agent": {"attach": {"rules": event_rules}}})
-        logger.info(f"已导入对话选项规则'{event_rules_file}'，共有{len(event_rules)}条记录")
+        logger.info(
+            "$agent.custom.action.climb_tower_preparation.run.imported",
+            {
+                "event_rules_file": event_rules_file,
+                "count": len(event_rules),
+            },
+        )
 
         # 清除潜能状态
         reset_state = attachments.get("reset_state", False)
@@ -96,23 +113,54 @@ class AscensionPreparation(CustomAction):
                 #         f"对话选项规则'{event_rules_path}'中包含加号(+)作为正则元字符，可能需要转义以避免解析或匹配异常")
                 event_rules = json.loads(content)
                 if not isinstance(event_rules, list):
-                    logger.error(f"对话选项规则文件'{event_rules_path}'解析后不是列表类型，无法使用")
+                    logger.error(
+                        "$agent.custom.action.climb_tower_preparation._load_event_rules.event_rules_wrong_type",
+                        {
+                            "event_rules_path": event_rules_path,
+                        },
+                    )
                     return []
                 if not event_rules:
-                    logger.error(f"对话选项规则文件'{event_rules_path}'解析后为空，无法使用")
+                    logger.error(
+                        "$agent.custom.action.climb_tower_preparation._load_event_rules.event_rules_empty",
+                        {
+                            "event_rules_path": event_rules_path,
+                        },
+                    )
                     return []
                 return event_rules
         except FileNotFoundError:
-            logger.error(f"无法找到对话选项规则文件：{event_rules_path}")
-            logger.error(f"请核实文件名字是否正确，或文件是否存在等")
+            logger.error(
+                "$agent.custom.action.climb_tower_preparation._load_event_rules.event_rules_file_not_found",
+                {
+                    "event_rules_path": event_rules_path,
+                },
+            )
+            logger.error(
+                "$agent.custom.action.climb_tower_preparation._load_event_rules.verify_event_rules_filename"
+            )
             return []
         except json.decoder.JSONDecodeError as e:
-            logger.error(f"无法解析对话选项规则文件，错误信息：{e}")
-            logger.error("请核实json内容的格式是否正确")
+            logger.error(
+                "$agent.custom.action.climb_tower_preparation._load_event_rules.event_rules_parse_failed",
+                {
+                    "e": e,
+                },
+            )
+            logger.error(
+                "$agent.custom.action.climb_tower_preparation._load_event_rules.verify_json_format"
+            )
             return []
         except OSError as e:
-            logger.error(f"读取文件失败：{e}")
-            logger.error("请核实文件权限是否正确，或是否存在文件编码问题等")
+            logger.error(
+                "$agent.custom.action.climb_tower_preparation._load_event_rules.file_read_failed",
+                {
+                    "e": e,
+                },
+            )
+            logger.error(
+                "$agent.custom.action.climb_tower_preparation._load_event_rules.verify_file_permissions"
+            )
             return []
 
     def _import_json_priority_list(self, context: Context, node_data: dict, preset_path: Path) -> bool:
@@ -135,17 +183,36 @@ class AscensionPreparation(CustomAction):
                 preset_potential_refresh = presets.get("potential_refresh", 0)
 
         except FileNotFoundError:
-            logger.error(f"无法找到预设作业文件：{full_path}")
-            logger.error(f"请核实预设作业名字是否正确，或预设作业是否存在等")
+            logger.error(
+                "$agent.custom.action.climb_tower_preparation._import_json_priority_list.preset_job_not_found",
+                {
+                    "full_path": full_path,
+                },
+            )
+            logger.error(
+                "$agent.custom.action.climb_tower_preparation._import_json_priority_list.verify_preset_job_name"
+            )
             return False
         except json.decoder.JSONDecodeError as e:
-            logger.error(f"无法解析作业文件，错误信息：{e}")
-            logger.error("请核实json内容的格式是否正确")
+            logger.error(
+                "$agent.custom.action.climb_tower_preparation._import_json_priority_list.preset_job_parse_failed",
+                {
+                    "e": e,
+                },
+            )
+            logger.error(
+                "$agent.custom.action.climb_tower_preparation._import_json_priority_list.verify_json_format"
+            )
             return False
 
         err = self._validate_priority_list(priority_list)
         if err:
-            logger.error(f"潜能优先级设置校验失败：{err}")
+            logger.error(
+                "$agent.custom.action.climb_tower_preparation._import_json_priority_list.potential_priority_invalid",
+                {
+                    "err": err,
+                },
+            )
             return False
 
         context.override_pipeline({
@@ -157,7 +224,12 @@ class AscensionPreparation(CustomAction):
         })
 
         if preset_element:
-            logger.info(f"从作业中检测到预设属性：{preset_element}，将覆盖选项中的属性塔选择")
+            logger.info(
+                "$agent.custom.action.climb_tower_preparation._import_json_priority_list.selected",
+                {
+                    "preset_element": preset_element,
+                },
+            )
             preset_element = preset_element.lower()
             match preset_element:
                 case "aqua" | "ventus" | "水" | "风" | "風":
@@ -206,12 +278,22 @@ class AscensionPreparation(CustomAction):
                         }
                     })
                 case _:
-                    logger.error(f"检测到未知属性：{preset_element}，请核实属性名是否符合文档要求")
+                    logger.error(
+                        "$agent.custom.action.climb_tower_preparation._import_json_priority_list.unknown_element",
+                        {
+                            "preset_element": preset_element,
+                        },
+                    )
                     context.tasker.post_stop()
                     return False
 
         if preset_trekker_names:
-            logger.info(f"从作业中检测到预设队伍：{preset_trekker_names}，爬塔前会自动选择该队伍")
+            logger.info(
+                "$agent.custom.action.climb_tower_preparation._import_json_priority_list.team_selected",
+                {
+                    "preset_trekker_names": preset_trekker_names,
+                },
+            )
             context.override_pipeline({
                 "星塔_编队角色_选择队伍_agent": {
                     "attach": {
@@ -221,7 +303,12 @@ class AscensionPreparation(CustomAction):
             })
 
         if preset_potential_refresh:
-            logger.info(f"从作业中检测到预设潜能最大刷新次数：{preset_potential_refresh}，将覆盖选项设置")
+            logger.info(
+                "$agent.custom.action.climb_tower_preparation._import_json_priority_list.detected",
+                {
+                    "preset_potential_refresh": preset_potential_refresh,
+                },
+            )
             context.override_pipeline({
                 "星塔_节点_选择潜能_agent": {
                     "attach": {
@@ -231,7 +318,12 @@ class AscensionPreparation(CustomAction):
             })
 
         if preset_melodies:
-            logger.info(f"从作业中检测到预设音符：{preset_melodies}，爬塔时会买入以上音符")
+            logger.info(
+                "$agent.custom.action.climb_tower_preparation._import_json_priority_list.melody_detected",
+                {
+                    "preset_melodies": preset_melodies,
+                },
+            )
             node_data = context.get_node_data("星塔_节点_商店_商店主流程_agent") or {}
             shop_attachments = node_data.get("attach", {})
             for melody in preset_melodies:
@@ -245,10 +337,20 @@ class AscensionPreparation(CustomAction):
                         }
                     })
                 else:
-                    logger.error(f"导入音符：{melody} 失败，请核实音符名是否符合文档要求")
+                    logger.error(
+                        "$agent.custom.action.climb_tower_preparation._import_json_priority_list.melody_import_failed",
+                        {
+                            "melody": melody,
+                        },
+                    )
                     return False
 
-        logger.info(f"已导入预设作业：{preset_name}")
+        logger.info(
+            "$agent.custom.action.climb_tower_preparation._import_json_priority_list.imported",
+            {
+                "preset_name": preset_name,
+            },
+        )
         return True
 
     @staticmethod
@@ -432,12 +534,17 @@ class SelectParty(CustomAction):
                 elif "sub" in position and cleaned_reco_name in cleaned_sub_trekker_names:
                     reco_names.append(reco_name)
             if len(reco_names) == 3:
-                logger.info(f"成功识别到队伍：{reco_names}")
+                logger.info(
+                    "$agent.custom.action.climb_tower_preparation.run.team_recognized",
+                    {
+                        "reco_names": reco_names,
+                    },
+                )
                 return True
             context.tasker.controller.post_click(1245, 345).wait()
             time.sleep(1)
 
-        logger.error("没有识别到作业对应队伍，请检查旅人名称是否正确，或是否有现成作业的编队")
+        logger.error("$agent.custom.action.climb_tower_preparation.run.preset_team_not_recognized")
         context.tasker.post_stop()
         return False
 
@@ -474,6 +581,8 @@ class SelectParty(CustomAction):
             logger.debug(f"没有识别到旅人名称")
             logger.debug(f"识别到的结果：{[[r.text, r.score] for r in reco_detail.all_results]}")
         else:
-            logger.error(f"识别旅人名称失败")
+            logger.error(
+                "$agent.custom.action.climb_tower_preparation._recognize_trekker_name.trekker_name_recognition_failed"
+            )
 
         return ""

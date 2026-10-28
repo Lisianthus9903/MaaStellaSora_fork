@@ -31,16 +31,35 @@ class AssistantPriorityHandler(ChoosePotentialHandler):
         for potential in self.data.potentials:
             print_rank = potential.rank if potential.in_preset else "无"
             if self.data.core_potential:
-                logger.info(f"[潜能识别] {potential.name} | 核心潜能 | 排名 {print_rank}")
+                logger.info(
+                    "$agent.custom.reco.climb_tower_potential.handler_json.choose_potential.status",
+                    {
+                        "name": potential.name,
+                        "print_rank": print_rank,
+                    },
+                )
             else:
                 old = potential.old_level
                 new = potential.new_level
-                logger.info(f"[潜能识别] {potential.name} | 等级 {old}→{new} | 排名 {print_rank}")
+                logger.info(
+                    "$agent.custom.reco.climb_tower_potential.handler_json.choose_potential.potential_status",
+                    {
+                        "name": potential.name,
+                        "old": old,
+                        "new": new,
+                        "print_rank": print_rank,
+                    },
+                )
 
         # 选择排名最高的潜能
         best_potential = self.best_potential
         if best_potential:
-            logger.info(f"[潜能选择] {best_potential.name}")
+            logger.info(
+                "$agent.custom.reco.climb_tower_potential.handler_json.choose_potential.selected",
+                {
+                    "name": best_potential.name,
+                },
+            )
 
         return best_potential
 

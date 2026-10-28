@@ -304,7 +304,12 @@ class PotentialDrawInfo:
 
         with open(file_path, "w", encoding="utf-8") as f:
             json.dump(self.potential_draws, f, ensure_ascii=False, indent=4)
-        logger.info(f"已导出潜能抽取数据到 {file_path}")
+        logger.info(
+            "$agent.custom.reco.climb_tower_potential.state.export.exported",
+            {
+                "file_path": file_path,
+            },
+        )
 
     @property
     def available(self) -> bool:

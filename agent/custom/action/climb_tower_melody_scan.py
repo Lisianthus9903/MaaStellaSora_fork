@@ -86,17 +86,29 @@ def scan_melody_counts(context: Context, target_melodies: list[str]) -> dict[str
         for melody in target_melodies:
             counts[melody] = _read_melody_count(context, image, melody)
             if counts[melody] == -1:
-                logger.error(f"读取音符{melody}的数量时出现问题，为保证爬塔质量，将结束任务")
+                logger.error(
+                    "$agent.custom.action.climb_tower_melody_scan.scan_melody_counts.task_stopped_for_safety",
+                    {
+                        "melody": melody,
+                    },
+                )
                 context.tasker.post_stop()
                 return {}
     except Exception as exc:
-        logger.error(f"读取音符数量时出现程序异常：{exc}，为保证爬塔质量，将结束任务")
+        logger.error(
+            "$agent.custom.action.climb_tower_melody_scan.scan_melody_counts.unexpected_exception",
+            {
+                "exc": exc,
+            },
+        )
         context.tasker.post_stop()
 
     if counts:
         logger.debug(f"读取到音符数量：{counts}")
     else:
-        logger.warning("未能读取到任何音符数量")
+        logger.warning(
+            "$agent.custom.action.climb_tower_melody_scan.scan_melody_counts.melody_counts_unavailable"
+        )
     return counts
 
 
@@ -114,7 +126,9 @@ def _get_element_melodies(context: Context, node: str) -> list[str]:
     node_data = context.get_node_data(node) or {}
     element_melodies = node_data.get("attach", {}).get("active_melodies", [])
     if not element_melodies:
-        logger.error(f"属性塔节点未配置属性音符，请检查设置是否正确。如你不是开发者，请联系开发人员")
+        logger.error(
+            "$agent.custom.action.climb_tower_melody_scan._get_element_melodies.element_melody_not_configured"
+        )
         context.tasker.post_stop()
     return element_melodies
 
@@ -122,7 +136,9 @@ def _get_element_melodies(context: Context, node: str) -> list[str]:
 def _open_melody_detail(context: Context) -> bool:
     """依次打开 背包 -> 秘纹技能，任一步失败即放弃。"""
     if not _run(context, OPEN_BAG_NODE):
-        logger.error("打开音符说明界面失败")
+        logger.error(
+            "$agent.custom.action.climb_tower_melody_scan._open_melody_detail.melody_details_open_failed"
+        )
         return False
     return True
 
@@ -130,7 +146,7 @@ def _open_melody_detail(context: Context) -> bool:
 def _close_bag(context: Context) -> bool:
     """关闭背包，任一步失败即放弃。"""
     if not _run(context, CLOSE_BAG_NODE):
-        logger.error("关闭背包界面失败")
+        logger.error("$agent.custom.action.climb_tower_melody_scan._close_bag.bag_close_failed")
         return False
     return True
 
@@ -140,11 +156,21 @@ def _read_melody_count(context: Context, image: np.ndarray, melody: str) -> int:
     pipeline_override = _make_pipeline_override(MELODY_NODE, melody)
     template_results = _recognize(context, MELODY_NODE, image, pipeline_override)
     if not template_results:
-        logger.error(f"未识别到音符{melody}的位置，请检查属性塔设置是否选择正确")
+        logger.error(
+            "$agent.custom.action.climb_tower_melody_scan._read_melody_count.melody_not_recognized",
+            {
+                "melody": melody,
+            },
+        )
         return -1
     ocr_results = _recognize(context, COUNT_NODE, image)
     if not ocr_results:
-        logger.error(f"未识别到音符{melody}的数量")
+        logger.error(
+            "$agent.custom.action.climb_tower_melody_scan._read_melody_count.melody_melody_not_recognized",
+            {
+                "melody": melody,
+            },
+        )
         return -1
     logger.debug(f"识别到音符{melody}的数量为：{ocr_results}")
     return int(ocr_results[0].text)

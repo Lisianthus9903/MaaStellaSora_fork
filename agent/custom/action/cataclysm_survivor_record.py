@@ -50,18 +50,22 @@ class CataclysmSurvivorPickRecord(CustomAction):
 
         image = _grab(context)
         if image is None:
-            logger.error("灾变防线：纪录管理页截图失败")
+            logger.error("$agent.custom.action.cataclysm_survivor_record.run.screenshot_failed")
             return False
 
         ## 复用当前节点的模板识别，拿到页面上所有记录卡（每张卡一个小徽标）
         detail = context.run_recognition(argv.node_name, image)
         if detail is None or not detail.hit:
-            logger.error("灾变防线：纪录管理页没有识别到任何记录卡")
+            logger.error(
+                "$agent.custom.action.cataclysm_survivor_record.run.record_cards_not_found"
+            )
             return False
 
         candidates = list(detail.filtered_results or detail.all_results or [])
         if not candidates:
-            logger.error("灾变防线：记录卡候选为空")
+            logger.error(
+                "$agent.custom.action.cataclysm_survivor_record.run.record_candidates_empty"
+            )
             return False
 
         arr = np.asarray(image)
@@ -73,13 +77,21 @@ class CataclysmSurvivorPickRecord(CustomAction):
 
         best_score, best_x, best_y, match_score = scored[0]
         logger.info(
-            "灾变防线：纪录管理页 %d 张记录卡，选中分数最高的一张（%.1f，模板分 %.3f，位置 %d,%d）",
-            len(scored), best_score, match_score, best_x, best_y,
+            "$agent.custom.action.cataclysm_survivor_record.run.record_card_scan_summary",
+            {
+                "value_1": len(scored),
+                "value_2": best_score,
+                "value_3": match_score,
+                "value_4": best_x,
+                "value_5": best_y,
+            },
         )
         logger.debug("灾变防线：各卡分数 %s", [round(s[0], 1) for s in scored])
 
         if best_score < 0:
-            logger.error("灾变防线：记录卡采样失败")
+            logger.error(
+                "$agent.custom.action.cataclysm_survivor_record.run.record_sampling_failed"
+            )
             return False
 
         click_x = best_x + CLICK_OFFSET[0]
@@ -87,7 +99,15 @@ class CataclysmSurvivorPickRecord(CustomAction):
         if context.tasker.stopping:
             return False
         if not wait_job(context, context.tasker.controller.post_click(click_x, click_y)):
-            logger.error("灾变防线：点击记录卡失败")
+            logger.error(
+                "$agent.custom.action.cataclysm_survivor_record.run.record_card_click_failed"
+            )
             return False
-        logger.info("灾变防线：已选择记录卡（点击 %d,%d）", click_x, click_y)
+        logger.info(
+            "$agent.custom.action.cataclysm_survivor_record.run.record_card_selected",
+            {
+                "value_1": click_x,
+                "value_2": click_y,
+            },
+        )
         return True

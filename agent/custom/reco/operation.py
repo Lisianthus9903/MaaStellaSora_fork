@@ -21,7 +21,12 @@ def _get_keep_count(context: Context, key: str) -> int | None:
         return None
     count = attach.get(key, 0)
     if type(count) is not int or count < 0:
-        logger.warning("保留数量配置无效：%s", key)
+        logger.warning(
+            "$agent.custom.reco.operation._get_keep_count.invalid_keep_count",
+            {
+                "value_1": key,
+            },
+        )
         return None
     return count
 
@@ -67,7 +72,13 @@ class EnoughTrackingPermitRecognition(CustomRecognition):
             logger.debug(f"追踪委托书数量{count}小于等于保留数量{keep_count}或数量为0")
             return CustomRecognition.AnalyzeResult(box=None, detail={})
         
-        logger.info(f"追踪委托书数量{count}大于保留数量{keep_count}，开始追踪")
+        logger.info(
+            "$agent.custom.reco.operation.analyze.dispatch_contract_count",
+            {
+                "count": count,
+                "keep_count": keep_count,
+            },
+        )
         quick_track_cost = min(5, max(2, count))
         if usable >= quick_track_cost:
             track_button_box = track_button_boxes[0]
@@ -109,7 +120,13 @@ class EnoughHuntLicenseRecognition(CustomRecognition):
             logger.debug(f"围猎许可证数量{count}小于等于保留数量{keep_count}或数量为0")
             return CustomRecognition.AnalyzeResult(box=None, detail={})
         
-        logger.info(f"围猎许可证数量{count}大于保留数量{keep_count}，开始协助讨伐")
+        logger.info(
+            "$agent.custom.reco.operation.analyze.hunt_license_count",
+            {
+                "count": count,
+                "keep_count": keep_count,
+            },
+        )
         return CustomRecognition.AnalyzeResult(box=coop_button_box, detail={})
 
     @staticmethod
