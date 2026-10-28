@@ -67,11 +67,11 @@ debug 与 release 使用不同的 Android applicationId 和桌面显示名：
 1. 检出本仓库和 MaaFwApp，安装 Python 3.12、JDK 17 与 Android SDK。
 2. 使用 MaaFwApp 的 `build_agent_bundle.py` 为 `arm64-v8a` 构建 Python Agent bundle；依赖来自 `agent/requirements.txt` 和 Chaquopy Android wheel 索引。
 3. 建立独立暂存 PI `android-build/pi/`，复制 `assets/` 与 `agent/`，确保这里的根级存在 `interface.json`。只在暂存副本中更新版本与 Android welcome 字段。
-4. 调用 `tools/ci/configure.py`，在暂存 PI 中准备 OCR 模型：保留并校验已存在的完整模型；缺失时从 `assets/MaaCommonAssets/OCR/ppocr_v6/small` 导入默认模型。
+4. 调用 `tools/ci/configure.py`，在暂存 PI 中准备 OCR 模型：保留并校验已存在的完整模型；缺失时从 `assets/MaaCommonAssets/OCR/ppocr_v6/small` 导入默认模型。韩服模型通过 `--kr-ocr-dir` 生成到暂存 PI 的 `resource/kr/model/ocr`。
 5. 构建前检查 `interface.json` 的 `import`、`resource.path` 和 `controller.attach_resource_path` 都能从 PI 根解析。
 6. 生成 MaaFwApp `profile.yaml`：PI 根作为 `assets`，显式列出 include；`app.icon` 指向项目 logo，Agent 运行时指向刚生成的 bundle。
 7. 下载并部署 ARM64 MaaFramework runtime，写入 MaaFwApp 所需 `local.properties`，构建所选 APK variant。
-8. 检查 APK 包名、版本、签名、原生库和 `assets/pi.zip` 内容（包括 OCR 检测模型、识别模型与字符表）；验证通过后按统一名称上传 artifact。
+8. 检查 APK 包名、版本、签名、原生库和 `assets/pi.zip` 内容（包括 OCR 检测模型、识别模型与字符表，以及韩服模型的许可证）；验证通过后按统一名称上传 artifact。
 
 **暂存目录是有意设计，不要直接改写源资源。** MaaFwApp profile 的 `assets` 必须指向包含根级 `interface.json` 的目录；PI 的导入和资源路径相对于该目录解析。`include` 一旦显式提供，就取代 MaaFwApp 的默认 include 列表，所以新增 PI 文件时要确认它已被纳入。修改资源或 Agent 入口时，应同步核对 PI 源定义、暂存检查、profile include 和最终 APK 检查。
 

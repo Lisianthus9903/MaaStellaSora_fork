@@ -91,9 +91,14 @@ jobs:
         run: |
           python ./tools/checks/check_resource.py ./assets/resource/base/ ./assets/resource/jp/
 
+      - name: Check Resource (KR)
+        run: |
+          python ./tools/checks/check_resource.py ./assets/resource/base/ ./assets/resource/kr/
+
       - name: Check desktop resource overlays
         run: |
           python ./tools/checks/check_resource.py ./assets/resource/base/ ./assets/resource/windows/
           python ./tools/checks/check_resource.py ./assets/resource/base/ ./assets/resource/tw/ ./assets/resource/windows/
           python ./tools/checks/check_resource.py ./assets/resource/base/ ./assets/resource/en/ ./assets/resource/windows/
           python ./tools/checks/check_resource.py ./assets/resource/base/ ./assets/resource/jp/ ./assets/resource/windows/
+          python ./tools/checks/check_resource.py ./assets/resource/base/ ./assets/resource/kr/ ./assets/resource/windows/
